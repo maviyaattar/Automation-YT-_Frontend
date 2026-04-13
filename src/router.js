@@ -123,7 +123,18 @@ function renderNotFound() {
   `;
 }
 
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;');
+}
+
 function renderError(err) {
+  const safeMessage = escapeHtml(err?.message || 'An unexpected error occurred.');
   return `
     <div class="page-container">
       <div class="empty-state">
@@ -131,7 +142,7 @@ function renderError(err) {
           <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
         </div>
         <div class="empty-state-title">Something went wrong</div>
-        <div class="empty-state-desc">${err?.message || 'An unexpected error occurred.'}</div>
+        <div class="empty-state-desc">${safeMessage}</div>
         <button class="btn btn-primary" onclick="window.location.reload()">Reload Page</button>
       </div>
     </div>
