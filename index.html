@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="AutoShorts AI — Automated YouTube Shorts creation powered by AI" />
+  <meta name="theme-color" content="#6366f1" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="AutoShorts AI" />
+  <meta property="og:description" content="AI-powered YouTube Shorts automation platform" />
+  <meta property="og:type" content="website" />
+
+  <title>AutoShorts AI</title>
+
+  <!-- Favicon (inline SVG as data URL) -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%236366f1'/><path d='M35 28L72 50L35 72V28Z' fill='white'/></svg>" />
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="./styles/base.css" />
+  <link rel="stylesheet" href="./styles/layout.css" />
+  <link rel="stylesheet" href="./styles/components.css" />
+  <link rel="stylesheet" href="./styles/animations.css" />
+
+  <!-- Responsive grid fix for auto mode -->
+  <style>
+    @media (max-width: 900px) {
+      [style*="grid-template-columns:1fr 1fr"] {
+        grid-template-columns: 1fr !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- App root -->
+  <div id="app"></div>
+
+  <!-- Toast container (mounted by toast.js) -->
+
+  <!-- App entry point (ES module) -->
+  <script type="module" src="./src/app.js"></script>
+
+  <!-- Expose toast helpers globally for inline handlers -->
+  <script type="module">
+    import { toastSuccess, toastError, toastInfo, toastWarning } from './src/toast.js';
+    window.toastSuccess = toastSuccess;
+    window.toastError = toastError;
+    window.toastInfo = toastInfo;
+    window.toastWarning = toastWarning;
+  </script>
+</body>
+</html>
