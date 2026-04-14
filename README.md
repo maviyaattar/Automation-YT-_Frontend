@@ -1,6 +1,6 @@
 # AutoShorts AI — Frontend
 
-A production-ready, fully responsive SaaS frontend for an AI-powered YouTube Shorts automation platform. Built with **pure HTML, CSS, and Vanilla JavaScript** — no build tools, no frameworks, no dependencies.
+A production-ready, fully responsive SaaS frontend for an AI-powered YouTube Shorts automation platform. Built with **pure HTML, CSS, and Vanilla JavaScript** using **Vite** as the build tool.
 
 ---
 
@@ -24,6 +24,9 @@ A production-ready, fully responsive SaaS frontend for an AI-powered YouTube Sho
 ```
 /
 ├── index.html              # App shell entry point
+├── .env.example            # Environment variable template
+├── vite.config.js          # (optional) Vite config
+├── package.json            # Dependencies & scripts
 ├── styles/
 │   ├── base.css            # CSS variables, reset, typography
 │   ├── layout.css          # Sidebar, topbar, main content, auth layout
@@ -50,50 +53,69 @@ A production-ready, fully responsive SaaS frontend for an AI-powered YouTube Sho
 
 ## 🌐 Backend API
 
-Base URL: `https://automation-yt-saas.onrender.com`
+Base URL configured via `VITE_API_BASE_URL` (see [Environment Variables](#-environment-variables)).
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | GET | `/auth/google` | Redirect to Google OAuth |
-| GET | `/auth/status` | Check auth status |
-| POST | `/auth/logout` | Logout |
-| GET | `/dashboard` | Dashboard data |
-| POST | `/generate` | Generate a Short |
-| POST | `/auto` | Set auto mode |
+| GET | `/auth/google/callback` | OAuth callback (sets session cookie, redirects to frontend) |
+| GET | `/auth/status` | Check auth status `{ authenticated, user? }` |
+| POST | `/auth/logout` | Logout (destroys session) |
+| GET | `/dashboard` | Dashboard data (channel info, recent videos) |
+| POST | `/generate` | Generate a Short → `{ videoId, quote }` |
+| POST | `/auto` | Set auto mode `{ enabled, scheduleHours? }` |
 | GET | `/logs` | Fetch logs |
 | DELETE | `/logs` | Clear logs |
 | GET | `/profile` | Get profile |
 | PATCH | `/profile` | Update profile |
 | POST | `/disconnect` | Disconnect YouTube |
+| GET | `/health` | Health check |
+
+---
+
+## 🔑 Environment Variables
+
+Copy `.env.example` to `.env` and fill in your values:
+
+```bash
+cp .env.example .env
+```
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `VITE_API_BASE_URL` | Backend API base URL (no trailing slash) | `https://automation-yt-saas.onrender.com` |
+
+> **Note**: On Vercel, set `VITE_API_BASE_URL` in **Project Settings → Environment Variables**.
 
 ---
 
 ## 🏃 Running Locally
 
-Because this is a pure static site (no build step), you just need a static file server.
-
-### Option 1: Python (built-in)
+### Install dependencies
 
 ```bash
-# Python 3
-python -m http.server 8080
-# Then open: http://localhost:8080
+npm install
 ```
 
-### Option 2: Node.js `serve`
+### Start dev server
 
 ```bash
-npx serve .
-# Then open the URL shown in the terminal
+npm run dev
+# Open http://localhost:5173
 ```
 
-### Option 3: VS Code Live Server
+### Build for production
 
-Install the **Live Server** extension, right-click `index.html`, and choose "Open with Live Server".
+```bash
+npm run build
+# Output in dist/
+```
 
-### Option 4: Any static host
+### Preview production build
 
-Deploy the entire folder to **Netlify**, **Vercel** (static), **GitHub Pages**, **Cloudflare Pages**, etc.
+```bash
+npm run preview
+```
 
 ---
 
@@ -102,10 +124,10 @@ Deploy the entire folder to **Netlify**, **Vercel** (static), **GitHub Pages**, 
 1. App loads → calls `GET /auth/status`
 2. If unauthenticated → shows login screen with **"Continue with Google"** button
 3. Clicking the button redirects to `GET /auth/google` (full page redirect)
-4. After OAuth, the backend sets a cookie and redirects back to the app
+4. After OAuth, the backend sets a session cookie and redirects back to the frontend
 5. App re-checks auth status and renders the main SPA
 
-> **CORS / Cookies**: All API calls use `fetch` with `credentials: 'include'` to send cookies. Your backend must have the correct `Access-Control-Allow-Origin` and `Access-Control-Allow-Credentials: true` headers.
+> **CORS / Cookies**: All API calls use `fetch` with `credentials: 'include'` to send session cookies. The backend must have matching `Access-Control-Allow-Origin` and `Access-Control-Allow-Credentials: true` headers.
 
 ---
 
@@ -124,8 +146,8 @@ Deploy the entire folder to **Netlify**, **Vercel** (static), **GitHub Pages**, 
 ## 🛠 Tech Notes
 
 - **No framework** — Vanilla JS with ES Modules (`type="module"`)
-- **No build tool** — Open `index.html` directly with a static server
-- **No dependencies** — Zero `npm install` required
+- **Build tool** — Vite (for `import.meta.env` env vars and fast HMR in dev)
 - **Icons** — Inline Lucide SVGs (no external CDN needed)
 - **Timeouts** — All API calls have a 30-second timeout via `AbortController`
-- **Error handling** — Centralized in `api.js`, consistent across all pages
+- **Error handling** — Centralized in `api.js`; 401 responses redirect to login
+- **Cookies** — `credentials: 'include'` on every fetch for session cookie support

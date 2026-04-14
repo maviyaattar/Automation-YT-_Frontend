@@ -3,8 +3,9 @@
  */
 
 import { icon } from '../icons.js';
-import { generate as generateApi } from '../api.js';
+import { generate as generateApi, ApiError } from '../api.js';
 import { toastSuccess, toastError } from '../toast.js';
+import { bus } from '../store.js';
 
 const STEPS = [
   { id: 'request', label: 'Sending request', desc: 'Submitting your generation request to the AI engine.' },
@@ -44,10 +45,15 @@ function renderSteps(activeIdx, errorIdx = -1) {
 function renderResult(data) {
   if (!data) return '';
 
-  const videoUrl = data?.videoUrl || data?.url || data?.youtubeUrl;
-  const title = data?.title || 'Your Short';
-  const description = data?.description || '';
-  const videoId = videoUrl ? extractVideoId(videoUrl) : null;
+  // Backend returns { videoId, quote }; also handle legacy shapes with URL/title
+  const videoId = data?.videoId || (data?.videoUrl ? extractVideoId(data.videoUrl) : null)
+    || (data?.url ? extractVideoId(data.url) : null)
+    || (data?.youtubeUrl ? extractVideoId(data.youtubeUrl) : null);
+  const videoUrl = videoId
+    ? `https://www.youtube.com/watch?v=${videoId}`
+    : (data?.videoUrl || data?.url || data?.youtubeUrl || null);
+  const title = data?.title || (videoId ? 'Your Short' : null);
+  const quote = data?.quote || data?.description || null;
 
   return `
     <div class="card animate-slide-up" style="margin-top:32px;">
@@ -74,15 +80,17 @@ function renderResult(data) {
           </div>
         ` : ''}
 
-        <div class="form-group">
-          <div class="form-label">Title</div>
-          <div class="result-box"><pre>${escHtml(title)}</pre></div>
-        </div>
-
-        ${description ? `
+        ${title ? `
           <div class="form-group">
-            <div class="form-label">Description</div>
-            <div class="result-box"><pre>${escHtml(description)}</pre></div>
+            <div class="form-label">Title</div>
+            <div class="result-box"><pre>${escHtml(title)}</pre></div>
+          </div>
+        ` : ''}
+
+        ${quote ? `
+          <div class="form-group">
+            <div class="form-label">Quote / Script</div>
+            <div class="result-box"><pre>${escHtml(quote)}</pre></div>
           </div>
         ` : ''}
 
@@ -97,7 +105,7 @@ function renderResult(data) {
           </div>
         ` : ''}
 
-        ${data && !videoUrl ? `
+        ${data && !videoUrl && !quote && !title ? `
           <div class="result-box">
             <pre>${escHtml(JSON.stringify(data, null, 2))}</pre>
           </div>
@@ -274,6 +282,10 @@ export function generatePage() {
 
         } catch (err) {
           clearTimeout(stepTimer);
+          if (err instanceof ApiError && err.status === 401) {
+            bus.emit('unauthenticated');
+            return;
+          }
           setStep(activeStep, activeStep);
           setBadge('Failed', 'error');
           resultEl.innerHTML = `
