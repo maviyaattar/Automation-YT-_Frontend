@@ -390,6 +390,14 @@
     .sidebar-spacer { flex: 1; }
     .sidebar-footer { padding-top: 16px; border-top: 1px solid var(--border); }
 
+    /* Main content column (wraps mobile-header + main on right of sidebar) */
+    .content-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
     /* Main content */
     .main-content {
       flex: 1;
@@ -486,12 +494,166 @@
     /* ── Grid helpers ────────────────────────────────────────────────────── */
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 
+    /* ── Theme variants ─────────────────────────────────────────────────── */
+    body.theme-light {
+      --bg:           #f8fafc;
+      --surface:      rgba(0,0,0,0.05);
+      --surface-hover:rgba(0,0,0,0.09);
+      --border:       rgba(0,0,0,0.12);
+      --text:         #0f172a;
+      --text-muted:   #64748b;
+      background-image: none;
+    }
+    body.theme-light .sidebar { background: rgba(241,245,249,0.95); }
+    body.theme-light select,
+    body.theme-light input[type="text"],
+    body.theme-light input[type="email"] { background: rgba(0,0,0,0.05); color: var(--text); }
+    body.theme-light select option { background: #f8fafc; color: #0f172a; }
+
+    body.theme-paper {
+      --bg:           #f5efe0;
+      --surface:      rgba(150,110,60,0.10);
+      --surface-hover:rgba(150,110,60,0.18);
+      --border:       rgba(100,75,40,0.18);
+      --text:         #2c1a06;
+      --text-muted:   #7a5f3a;
+      background-image: none;
+    }
+    body.theme-paper .sidebar { background: rgba(235,220,195,0.95); }
+    body.theme-paper select,
+    body.theme-paper input[type="text"],
+    body.theme-paper input[type="email"] { background: rgba(0,0,0,0.05); color: var(--text); }
+    body.theme-paper select option { background: #f5efe0; color: #2c1a06; }
+
+    /* dark theme is default; re-declare for explicit selection */
+    body.theme-dark {
+      --bg:           #0f0f1a;
+      --surface:      rgba(255,255,255,0.06);
+      --surface-hover:rgba(255,255,255,0.10);
+      --border:       rgba(255,255,255,0.10);
+      --text:         #e2e8f0;
+      --text-muted:   #94a3b8;
+    }
+
+    /* ── Toggle switch ───────────────────────────────────────────────────── */
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 22px;
+    }
+    .toggle-label-text { font-weight: 600; font-size: 0.95rem; }
+    .toggle-label-sub  { font-size: 0.78rem; color: var(--text-muted); margin-top: 3px; }
+
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 52px;
+      height: 28px;
+      flex-shrink: 0;
+    }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; position: absolute; }
+    .toggle-track {
+      position: absolute;
+      inset: 0;
+      background: rgba(255,255,255,0.18);
+      border-radius: 28px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      border: 1px solid var(--border);
+    }
+    .toggle-track::before {
+      content: '';
+      position: absolute;
+      width: 22px; height: 22px;
+      left: 2px; top: 2px;
+      background: #fff;
+      border-radius: 50%;
+      transition: transform 0.3s cubic-bezier(.4,0,.2,1);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    }
+    .toggle-switch input:checked + .toggle-track { background: var(--brand); border-color: var(--brand-dark); }
+    .toggle-switch input:checked + .toggle-track::before { transform: translateX(24px); }
+    .toggle-switch input:focus-visible + .toggle-track { outline: 2px solid var(--brand-light); outline-offset: 3px; }
+
+    /* ── Range slider ────────────────────────────────────────────────────── */
+    .range-wrap { margin-top: 8px; }
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--brand);
+      cursor: pointer;
+      height: 6px;
+    }
+    .range-ticks {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-top: 5px;
+      padding: 0 2px;
+    }
+
+    /* ── Skeleton shimmer ────────────────────────────────────────────────── */
+    @keyframes shimmer {
+      0%   { background-position: -600px 0; }
+      100% { background-position:  600px 0; }
+    }
+    .skeleton {
+      background: linear-gradient(
+        90deg,
+        var(--surface)       25%,
+        var(--surface-hover) 50%,
+        var(--surface)       75%
+      ) !important;
+      background-size: 1200px 100% !important;
+      animation: shimmer 1.5s infinite linear !important;
+      border-radius: var(--radius-sm) !important;
+      color: transparent !important;
+      border-color: transparent !important;
+      pointer-events: none;
+      user-select: none;
+      min-height: 16px;
+    }
+    .skeleton * { visibility: hidden; }
+
+    /* Skeleton placeholder blocks inside logs list */
+    .skeleton-block {
+      height: 52px;
+      border-radius: var(--radius-sm);
+      background: linear-gradient(
+        90deg,
+        var(--surface)       25%,
+        var(--surface-hover) 50%,
+        var(--surface)       75%
+      );
+      background-size: 1200px 100%;
+      animation: shimmer 1.5s infinite linear;
+      margin-bottom: 8px;
+    }
+
+    /* ── Mobile header ───────────────────────────────────────────────────── */
+    .mobile-header {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px;
+      background: rgba(15,15,26,0.90);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .mobile-header-brand { font-size: 0.95rem; font-weight: 700; color: var(--text); }
+
     /* ── Responsive ──────────────────────────────────────────────────────── */
     @media (max-width: 768px) {
       .sidebar { display: none; }
       .main-content { padding: 20px 16px; }
       .section-tabs { display: flex; }
       .grid-2 { grid-template-columns: 1fr; }
+      .mobile-header { display: flex; }
     }
   </style>
 </head>
@@ -607,6 +769,24 @@
       </div>
     </aside>
 
+    <!-- ── Mobile header + Main content (right column) ──────────────── -->
+    <div class="content-col">
+
+    <!-- ── Mobile header (shown only on small screens) ───────────────── -->
+    <div class="mobile-header" aria-label="Mobile navigation">
+      <div class="mobile-header-brand">AutoShorts AI</div>
+      <button id="btn-logout-mobile" type="button" class="btn btn-ghost btn-sm" aria-label="Logout">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
+             style="width:14px;height:14px">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+          <polyline points="16 17 21 12 16 7"></polyline>
+          <line x1="21" y1="12" x2="9" y2="12"></line>
+        </svg>
+        Logout
+      </button>
+    </div>
+
     <!-- ── Main content area ──────────────────────────────────────────── -->
     <main class="main-content" id="main-content">
 
@@ -665,6 +845,19 @@
 
         <div class="card">
           <form id="settings-form" novalidate>
+
+            <!-- Automation ON/OFF toggle -->
+            <div class="toggle-row">
+              <div>
+                <div class="toggle-label-text">Automation ON/OFF</div>
+                <div class="toggle-label-sub">Enable automated posting to YouTube Shorts</div>
+              </div>
+              <label class="toggle-switch" aria-label="Toggle automation mode">
+                <input type="checkbox" id="chk-auto-mode" />
+                <span class="toggle-track"></span>
+              </label>
+            </div>
+
             <!-- Content Type -->
             <div class="form-group">
               <label for="sel-content-type">Content Type</label>
@@ -678,26 +871,26 @@
             <!-- Background Theme -->
             <div class="form-group">
               <label for="sel-bg-theme">Background Theme</label>
-              <select id="sel-bg-theme" name="backgroundTheme">
-                <option value="paper">Paper</option>
+              <select id="sel-bg-theme" name="bgType">
                 <option value="dark">Dark</option>
                 <option value="light">Light</option>
+                <option value="paper">Paper</option>
               </select>
             </div>
 
             <!-- Daily Posts -->
             <div class="form-group">
-              <label for="sel-daily-posts">Daily Posts</label>
-              <select id="sel-daily-posts" name="dailyPosts">
-                <option value="1">1 post/day</option>
-                <option value="2">2 posts/day</option>
-                <option value="3">3 posts/day</option>
-                <option value="4">4 posts/day</option>
-                <option value="5">5 posts/day</option>
-                <option value="6">6 posts/day</option>
-                <option value="7">7 posts/day</option>
-                <option value="8">8 posts/day</option>
-              </select>
+              <label for="inp-daily-posts">
+                Posts per Day:
+                <strong id="posts-val" style="color:var(--brand-light)">3</strong>
+              </label>
+              <div class="range-wrap">
+                <input type="range" id="inp-daily-posts" name="postsPerDay" min="1" max="8" value="3" />
+                <div class="range-ticks" aria-hidden="true">
+                  <span>1</span><span>2</span><span>3</span><span>4</span>
+                  <span>5</span><span>6</span><span>7</span><span>8</span>
+                </div>
+              </div>
             </div>
 
             <!-- Save button + inline status -->
@@ -776,6 +969,7 @@
       </section>
 
     </main><!-- /.main-content -->
+    </div><!-- /.content-col -->
   </div><!-- /#dashboard -->
 
   <!-- =====================================================================
@@ -933,6 +1127,16 @@
     let currentUser = null;
 
     /**
+     * applyTheme — add the matching theme class to <body> and remove others.
+     * Called on background-theme dropdown change and after profile load.
+     * @param {string} theme — 'dark' | 'light' | 'paper'
+     */
+    function applyTheme(theme) {
+      document.body.classList.remove('theme-dark', 'theme-light', 'theme-paper');
+      if (theme) document.body.classList.add('theme-' + theme);
+    }
+
+    /**
      * checkAuthAndRender — called on page load.
      * Hits GET /auth/status; shows dashboard or login accordingly.
      */
@@ -1000,6 +1204,11 @@
       document.getElementById('loading-screen').classList.add('hidden');
       document.getElementById('login-screen').classList.add('hidden');
       document.getElementById('dashboard').classList.remove('hidden');
+
+      /* Show skeleton placeholders on user info until data arrives */
+      ['user-avatar', 'user-name', 'user-email'].forEach(id => {
+        document.getElementById(id).classList.add('skeleton');
+      });
 
       populateUserInfo();
       loadLogs();   /* pre-fetch logs so the tab is ready */
@@ -1080,6 +1289,11 @@
       /* Avatar: first letter of username (uppercase) */
       const initial = username.charAt(0).toUpperCase() || '?';
       document.getElementById('user-avatar').textContent = initial;
+
+      /* Remove skeleton classes now that data is ready */
+      ['user-avatar', 'user-name', 'user-email'].forEach(id => {
+        document.getElementById(id).classList.remove('skeleton');
+      });
     }
 
     /* ====================================================================
@@ -1095,14 +1309,34 @@
         const profile = await apiFetch('/profile');
         if (!profile) return;
 
-        /* Map API response fields to form inputs (defensive: field may be missing) */
-        const safeSet = (id, val) => {
-          const el = document.getElementById(id);
-          if (el && val !== undefined && val !== null) el.value = val;
-        };
-        safeSet('sel-content-type',  profile.contentType  || profile.content_type);
-        safeSet('sel-bg-theme',      profile.backgroundTheme || profile.background_theme);
-        safeSet('sel-daily-posts',   profile.dailyPosts   || profile.daily_posts);
+        /* Content type */
+        const ct = profile.contentType || profile.content_type;
+        const ctEl = document.getElementById('sel-content-type');
+        if (ctEl && ct != null) ctEl.value = ct;
+
+        /* Background theme — accept bgType or legacy field names */
+        const bg = profile.bgType || profile.backgroundTheme || profile.background_theme;
+        const bgEl = document.getElementById('sel-bg-theme');
+        if (bgEl && bg != null) {
+          bgEl.value = bg;
+          applyTheme(bg);
+        }
+
+        /* Posts per day — accept postsPerDay or legacy field names */
+        const posts = profile.postsPerDay ?? profile.dailyPosts ?? profile.posts_per_day;
+        if (posts != null) {
+          const slider = document.getElementById('inp-daily-posts');
+          const label  = document.getElementById('posts-val');
+          if (slider) slider.value = posts;
+          if (label)  label.textContent = posts;
+        }
+
+        /* Auto mode toggle */
+        const autoMode = profile.autoMode ?? profile.auto_mode;
+        if (autoMode != null) {
+          const chk = document.getElementById('chk-auto-mode');
+          if (chk) chk.checked = Boolean(autoMode);
+        }
       } catch (err) {
         /* Not fatal — form already has sensible defaults */
         if (err.status !== 404) {
@@ -1122,11 +1356,12 @@
       const btn     = document.getElementById('btn-save-settings');
       const restore = setButtonLoading(btn, 'Saving…');
 
-      /* Collect form values */
+      /* Collect form values — field names match the API spec exactly */
       const payload = {
-        contentType:     document.getElementById('sel-content-type').value,
-        backgroundTheme: document.getElementById('sel-bg-theme').value,
-        dailyPosts:      parseInt(document.getElementById('sel-daily-posts').value, 10),
+        contentType: document.getElementById('sel-content-type').value,
+        bgType:      document.getElementById('sel-bg-theme').value,
+        postsPerDay: parseInt(document.getElementById('inp-daily-posts').value, 10),
+        autoMode:    document.getElementById('chk-auto-mode').checked,
       };
 
       try {
@@ -1189,8 +1424,10 @@
       const container = document.getElementById('logs-list');
       if (!container) return;
 
-      /* Show loading state */
-      container.innerHTML = '<div class="logs-empty"><span class="spinner" aria-hidden="true"></span> Loading logs…</div>';
+      /* Show shimmer skeleton placeholders while loading */
+      container.innerHTML = [1,2,3].map(() =>
+        '<div class="skeleton-block" role="presentation"></div>'
+      ).join('');
 
       try {
         const data = await apiFetch('/logs');
@@ -1280,12 +1517,13 @@
 
       /* ── Login button ─────────────────────────────────────────────────── */
       document.getElementById('btn-google-login').addEventListener('click', () => {
-        /* Full-page redirect to backend OAuth endpoint */
-        window.location.href = API_BASE + '/auth/google';
+        /* Full-page redirect to backend OAuth endpoint (relative path) */
+        window.location.href = '/auth/google';
       });
 
-      /* ── Logout button ────────────────────────────────────────────────── */
+      /* ── Logout buttons (sidebar + mobile header) ─────────────────────── */
       document.getElementById('btn-logout').addEventListener('click', logout);
+      document.getElementById('btn-logout-mobile').addEventListener('click', logout);
 
       /* ── Sidebar nav buttons ─────────────────────────────────────────── */
       document.querySelectorAll('.nav-item[data-section]').forEach(btn => {
@@ -1311,6 +1549,16 @@
 
       /* ── Settings form submit ─────────────────────────────────────────── */
       document.getElementById('settings-form').addEventListener('submit', saveSettings);
+
+      /* ── Background theme — apply to UI immediately on change ─────────── */
+      document.getElementById('sel-bg-theme').addEventListener('change', function () {
+        applyTheme(this.value);
+      });
+
+      /* ── Posts-per-day range slider — update live label ──────────────── */
+      document.getElementById('inp-daily-posts').addEventListener('input', function () {
+        document.getElementById('posts-val').textContent = this.value;
+      });
 
       /* ── Lazy-load settings when section becomes active ──────────────── */
       /* We hook into each nav item click to detect settings navigation */
