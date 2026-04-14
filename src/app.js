@@ -3,8 +3,8 @@
  */
 
 import { icon } from './icons.js';
-import { auth } from './api.js';
-import { store } from './store.js';
+import { auth, ApiError } from './api.js';
+import { store, bus } from './store.js';
 import { initRouter, route, replace, render } from './router.js';
 import { toastError } from './toast.js';
 
@@ -33,11 +33,11 @@ function buildSidebar(user) {
       </div>
 
       <nav class="sidebar-nav">
-        <a data-path="/dashboard">${icon('layoutDashboard')} Dashboard</a>
-        <a data-path="/generate">${icon('sparkles')} Generate</a>
-        <a data-path="/auto">${icon('bolt')} Auto Mode</a>
-        <a data-path="/logs">${icon('scrollText')} Logs</a>
-        <a data-path="/profile">${icon('user')} Profile</a>
+        <a class="nav-item" data-path="/dashboard">${icon('layoutDashboard')} Dashboard</a>
+        <a class="nav-item" data-path="/generate">${icon('sparkles')} Generate</a>
+        <a class="nav-item" data-path="/auto">${icon('bolt')} Auto Mode</a>
+        <a class="nav-item" data-path="/logs">${icon('scrollText')} Logs</a>
+        <a class="nav-item" data-path="/profile">${icon('user')} Profile</a>
       </nav>
 
       <div class="sidebar-footer">
@@ -66,7 +66,9 @@ function registerRoutes() {
 async function checkAuth() {
   try {
     return await auth.status();
-  } catch {
+  } catch (err) {
+    // 401 means not authenticated — normal flow, not an error
+    if (err instanceof ApiError && err.status === 401) return { authenticated: false };
     return null;
   }
 }
@@ -91,9 +93,14 @@ function showLoading() {
 async function init() {
   showLoading();
 
+  // Pages can emit 'unauthenticated' on the bus when they receive a 401
+  bus.on('unauthenticated', () => {
+    store.set({ user: null, isAuthenticated: false });
+    showLogin();
+  });
+
   const authData = await checkAuth();
 
-  // 🔥 FIXED AUTH LOGIC
   const isAuthenticated = authData?.authenticated === true;
 
   if (!isAuthenticated) {

@@ -3,8 +3,9 @@
  */
 
 import { icon } from '../icons.js';
-import { dashboard as dashboardApi } from '../api.js';
+import { dashboard as dashboardApi, ApiError } from '../api.js';
 import { toastError } from '../toast.js';
+import { bus } from '../store.js';
 
 function formatNumber(n) {
   if (!n && n !== 0) return '—';
@@ -213,7 +214,6 @@ async function loadDashboard(container) {
     const data = await dashboardApi.get();
     const channel = data?.channel || data?.channelInfo || {};
     const videos = data?.recentVideos || data?.videos || [];
-
     view.innerHTML = `
       <div class="page-container animate-slide-up">
         <div class="page-header">
@@ -244,6 +244,10 @@ async function loadDashboard(container) {
       </div>
     `;
   } catch (err) {
+    if (err instanceof ApiError && err.status === 401) {
+      bus.emit('unauthenticated');
+      return;
+    }
     view.innerHTML = renderError(err.message || 'Failed to load dashboard');
     const retryBtn = view.querySelector('#dashboard-retry');
     if (retryBtn) {

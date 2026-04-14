@@ -3,9 +3,10 @@
  */
 
 import { icon } from '../icons.js';
-import { logs as logsApi } from '../api.js';
+import { logs as logsApi, ApiError } from '../api.js';
 import { toastSuccess, toastError } from '../toast.js';
 import { showModal } from '../modal.js';
+import { bus } from '../store.js';
 
 const POLL_INTERVAL = 5000; // 5 seconds
 let pollTimer = null;
@@ -185,6 +186,10 @@ export function logsPage() {
 
           updateLastUpdated();
         } catch (err) {
+          if (err instanceof ApiError && err.status === 401) {
+            bus.emit('unauthenticated');
+            return;
+          }
           loadingEl.innerHTML = `
             <div style="text-align:center;">
               <div style="color:var(--color-error);margin-bottom:8px;">${icon('alertCircle', { size: 18 })}</div>

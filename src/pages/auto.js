@@ -3,17 +3,35 @@
  */
 
 import { icon } from '../icons.js';
-import { auto as autoApi, profile as profileApi } from '../api.js';
+import { auto as autoApi, profile as profileApi, ApiError } from '../api.js';
 import { toastSuccess, toastError, toastInfo } from '../toast.js';
-import { store } from '../store.js';
+import { store, bus } from '../store.js';
 
 const SCHEDULES = [
-  { value: 'hourly', label: 'Every Hour', desc: 'Post once per hour (high frequency)' },
-  { value: '4hours', label: 'Every 4 Hours', desc: 'Post 6 times per day' },
-  { value: '12hours', label: 'Twice Daily', desc: 'Post morning and evening' },
-  { value: 'daily', label: 'Once Daily', desc: 'Post once per day (recommended)' },
-  { value: 'weekly', label: 'Weekly', desc: 'Post once per week' },
+  { value: 'hourly',  label: 'Every Hour',   desc: 'Post once per hour (high frequency)',  hours: 1   },
+  { value: '4hours',  label: 'Every 4 Hours', desc: 'Post 6 times per day',                 hours: 4   },
+  { value: '12hours', label: 'Twice Daily',   desc: 'Post morning and evening',             hours: 12  },
+  { value: 'daily',   label: 'Once Daily',    desc: 'Post once per day (recommended)',      hours: 24  },
+  { value: 'weekly',  label: 'Weekly',        desc: 'Post once per week',                   hours: 168 },
 ];
+
+/** Convert a schedule string ('daily', etc.) to hours number for the backend. */
+function scheduleToHours(value) {
+  return SCHEDULES.find(s => s.value === value)?.hours ?? 24;
+}
+
+/** Convert a scheduleHours number from the backend to our schedule string. */
+function hoursToSchedule(hours) {
+  if (!hours && hours !== 0) return 'daily';
+  // Pick the closest match
+  let best = SCHEDULES[3]; // default: daily
+  let bestDiff = Infinity;
+  for (const s of SCHEDULES) {
+    const diff = Math.abs(s.hours - hours);
+    if (diff < bestDiff) { bestDiff = diff; best = s; }
+  }
+  return best.value;
+}
 
 function formatDateTime(dt) {
   if (!dt) return '—';
@@ -68,10 +86,19 @@ async function loadAutoMode(container) {
   try {
     const data = await profileApi.get();
     currentEnabled = data?.autoMode?.enabled ?? data?.autoEnabled ?? false;
-    currentSchedule = data?.autoMode?.schedule ?? data?.schedule ?? 'daily';
+    // Backend stores scheduleHours (number); fall back to schedule string if present
+    const rawHours = data?.autoMode?.scheduleHours ?? data?.scheduleHours ?? null;
+    const rawSchedule = data?.autoMode?.schedule ?? data?.schedule ?? null;
+    currentSchedule = rawHours !== null ? hoursToSchedule(rawHours) : (rawSchedule ?? 'daily');
     lastRun = data?.autoMode?.lastRun ?? data?.lastRun ?? null;
     nextRun = data?.autoMode?.nextRun ?? data?.nextRun ?? null;
-  } catch { /* non-fatal, use defaults */ }
+  } catch (err) {
+    if (err instanceof ApiError && err.status === 401) {
+      bus.emit('unauthenticated');
+      return;
+    }
+    /* other errors are non-fatal; use defaults */
+  }
 
   store.set({ autoEnabled: currentEnabled, autoSchedule: currentSchedule, lastRun, nextRun });
   renderAutoView(view, { currentEnabled, currentSchedule, lastRun, nextRun });
@@ -228,14 +255,14 @@ function renderAutoView(view, { currentEnabled, currentSchedule, lastRun, nextRu
     const style = view.querySelector('#auto-style')?.value || 'auto';
 
     try {
-      const data = await autoApi.set({ enabled, schedule: selectedSchedule, topic, style });
+      const data = await autoApi.set({ enabled, scheduleHours: scheduleToHours(selectedSchedule) });
       store.set({ autoEnabled: enabled, autoSchedule: selectedSchedule });
 
-      // Update last/next run if returned
-      if (data?.lastRun || data?.nextRun) {
-        view.querySelector('#last-run-val').textContent = formatDateTime(data.lastRun);
-        view.querySelector('#next-run-val').textContent = formatDateTime(data.nextRun);
-      }
+      // Backend returns { autoMode, scheduleHours, lastRun, nextRun } — handle both shapes
+      const newLastRun = data?.lastRun ?? data?.autoMode?.lastRun ?? null;
+      const newNextRun = data?.nextRun ?? data?.autoMode?.nextRun ?? null;
+      if (newLastRun) view.querySelector('#last-run-val').textContent = formatDateTime(newLastRun);
+      if (newNextRun) view.querySelector('#next-run-val').textContent = formatDateTime(newNextRun);
 
       toastSuccess(
         enabled ? 'Auto mode enabled' : 'Auto mode paused',
@@ -261,14 +288,12 @@ function renderAutoView(view, { currentEnabled, currentSchedule, lastRun, nextRu
 
     try {
       toastInfo('Running now…', 'Triggering an immediate generation. This may take a few minutes.');
-      const data = await autoApi.set({ enabled: toggleEl.checked, runNow: true, topic, style });
+      const data = await autoApi.set({ enabled: toggleEl.checked, runNow: true });
 
-      if (data?.lastRun) {
-        view.querySelector('#last-run-val').textContent = formatDateTime(data.lastRun);
-      }
-      if (data?.nextRun) {
-        view.querySelector('#next-run-val').textContent = formatDateTime(data.nextRun);
-      }
+      const newLastRun = data?.lastRun ?? data?.autoMode?.lastRun ?? null;
+      const newNextRun = data?.nextRun ?? data?.autoMode?.nextRun ?? null;
+      if (newLastRun) view.querySelector('#last-run-val').textContent = formatDateTime(newLastRun);
+      if (newNextRun) view.querySelector('#next-run-val').textContent = formatDateTime(newNextRun);
 
       toastSuccess('Run triggered!', 'A new Short is being generated.');
     } catch (err) {

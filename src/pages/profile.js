@@ -3,10 +3,10 @@
  */
 
 import { icon } from '../icons.js';
-import { profile as profileApi, auth, disconnect as disconnectApi } from '../api.js';
+import { profile as profileApi, auth, disconnect as disconnectApi, ApiError } from '../api.js';
 import { toastSuccess, toastError } from '../toast.js';
 import { showModal } from '../modal.js';
-import { store } from '../store.js';
+import { store, bus } from '../store.js';
 import { navigate } from '../router.js';
 
 function skeletonProfile() {
@@ -63,6 +63,10 @@ async function loadProfile(container) {
   try {
     profileData = await profileApi.get();
   } catch (err) {
+    if (err instanceof ApiError && err.status === 401) {
+      bus.emit('unauthenticated');
+      return;
+    }
     view.innerHTML = `
       <div class="page-container">
         <div class="alert alert-error" style="margin-bottom:16px;">

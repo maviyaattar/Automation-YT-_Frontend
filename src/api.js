@@ -1,10 +1,10 @@
 /**
  * api.js — Centralized API wrapper
- * Base URL: https://automation-yt-saas.onrender.com
+ * Base URL: configured via VITE_API_BASE_URL environment variable.
  * Uses fetch with credentials: 'include' for cookie-based auth.
  */
 
-const BASE_URL = 'https://automation-yt-saas.onrender.com';
+const BASE_URL = (import.meta.env.VITE_API_BASE_URL || 'https://automation-yt-saas.onrender.com').replace(/\/$/, '');
 const DEFAULT_TIMEOUT = 30000; // 30s
 
 /**
