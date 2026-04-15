@@ -8,13 +8,8 @@
     :root{
       --bg1:#0b1220;
       --bg2:#0f1b33;
-      --card:#0f172a;
-      --card2:#111c34;
       --text:#e5e7eb;
       --muted:#9ca3af;
-      --primary:#7c3aed;
-      --primary2:#22c55e;
-      --danger:#ef4444;
       --border:rgba(255,255,255,.08);
       --shadow: 0 18px 45px rgba(0,0,0,.45);
       --radius: 18px;
@@ -29,174 +24,81 @@
       color:var(--text);
       min-height:100vh;
     }
-
     .wrap{max-width:1100px;margin:0 auto;padding:28px 16px 40px}
-    .topbar{
-      display:flex; align-items:center; justify-content:space-between;
-      gap:12px; margin-bottom:18px;
-    }
-    .brand{
-      display:flex; align-items:center; gap:12px;
-    }
-    .logo{
-      width:44px; height:44px; border-radius:14px;
-      background: linear-gradient(135deg, rgba(124,58,237,1), rgba(34,197,94,1));
-      box-shadow: 0 10px 25px rgba(124,58,237,.25);
-    }
+    .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg, rgba(124,58,237,1), rgba(34,197,94,1));box-shadow:0 10px 25px rgba(124,58,237,.25)}
     h1{font-size:18px;margin:0}
     .sub{color:var(--muted);font-size:13px;margin-top:2px}
 
-    .grid{
-      display:grid;
-      grid-template-columns: 1.15fr .85fr;
-      gap:16px;
-    }
-    @media (max-width: 900px){
-      .grid{grid-template-columns:1fr}
-    }
+    .grid{display:grid;grid-template-columns:1.15fr .85fr;gap:16px}
+    @media (max-width:900px){.grid{grid-template-columns:1fr}}
 
     .card{
       background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
       border:1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
       padding:18px;
     }
-    .card h2{
-      margin:0 0 12px;
-      font-size:14px;
-      letter-spacing:.2px;
-      color:#f3f4f6;
-    }
+    .card h2{margin:0 0 12px;font-size:14px;color:#f3f4f6}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    @media (max-width:520px){.row{grid-template-columns:1fr}}
 
-    .row{display:grid; grid-template-columns: 1fr 1fr; gap:12px}
-    @media (max-width:520px){ .row{grid-template-columns:1fr} }
-
-    label{display:block;font-size:12px;color:var(--muted); margin:10px 0 6px}
+    label{display:block;font-size:12px;color:var(--muted);margin:10px 0 6px}
     select,input{
       width:100%;
       padding:12px 12px;
-      border-radius: 12px;
+      border-radius:12px;
       border:1px solid var(--border);
       background: rgba(0,0,0,.18);
       color:var(--text);
       outline:none;
-      transition:.18s ease;
     }
-    select:focus,input:focus{border-color: rgba(124,58,237,.6); box-shadow:0 0 0 4px rgba(124,58,237,.18)}
-    input[type="number"]{appearance:textfield}
 
-    .actions{display:flex; gap:10px; flex-wrap:wrap; margin-top:14px}
+    .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
     .btn{
       border:1px solid var(--border);
       background: rgba(255,255,255,.06);
       color:var(--text);
       padding:11px 14px;
-      border-radius: 14px;
+      border-radius:14px;
       cursor:pointer;
       font-weight:600;
-      transition: transform .12s ease, background .18s ease, border-color .18s ease, opacity .18s ease;
-      user-select:none;
     }
-    .btn:hover{transform: translateY(-1px); background: rgba(255,255,255,.09)}
-    .btn:disabled{opacity:.55; cursor:not-allowed; transform:none}
-    .btn.primary{background: linear-gradient(135deg, rgba(124,58,237,.9), rgba(124,58,237,.55)); border-color: rgba(124,58,237,.55)}
-    .btn.primary:hover{background: linear-gradient(135deg, rgba(124,58,237,1), rgba(124,58,237,.65))}
-    .btn.success{background: linear-gradient(135deg, rgba(34,197,94,.85), rgba(34,197,94,.45)); border-color: rgba(34,197,94,.55)}
-    .btn.danger{background: linear-gradient(135deg, rgba(239,68,68,.85), rgba(239,68,68,.45)); border-color: rgba(239,68,68,.55)}
+    .btn.primary{background:linear-gradient(135deg, rgba(124,58,237,.9), rgba(124,58,237,.55))}
+    .btn.success{background:linear-gradient(135deg, rgba(34,197,94,.85), rgba(34,197,94,.45))}
+    .btn:disabled{opacity:.55;cursor:not-allowed}
 
     .muted{color:var(--muted);font-size:12px;line-height:1.45}
 
-    /* Toggle */
-    .toggleRow{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:10px; padding:12px; border-radius:14px; border:1px solid var(--border); background: rgba(0,0,0,.12)}
+    .toggleRow{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px;padding:12px;border-radius:14px;border:1px solid var(--border);background:rgba(0,0,0,.12)}
     .toggleRow strong{font-size:13px}
-    .switch{position:relative; width:52px; height:30px; flex:0 0 auto}
+    .switch{position:relative;width:52px;height:30px}
     .switch input{display:none}
-    .slider{
-      position:absolute; inset:0;
-      background: rgba(255,255,255,.15);
-      border:1px solid var(--border);
-      border-radius:999px;
-      transition:.2s ease;
-    }
-    .slider:before{
-      content:"";
-      position:absolute;
-      height:24px; width:24px;
-      left:3px; top:2px;
-      background:white;
-      border-radius:999px;
-      transition:.2s ease;
-      box-shadow: 0 10px 20px rgba(0,0,0,.35);
-    }
-    .switch input:checked + .slider{
-      background: rgba(34,197,94,.35);
-      border-color: rgba(34,197,94,.5);
-    }
-    .switch input:checked + .slider:before{transform: translateX(22px)}
+    .slider{position:absolute;inset:0;background:rgba(255,255,255,.15);border:1px solid var(--border);border-radius:999px}
+    .slider:before{content:"";position:absolute;height:24px;width:24px;left:3px;top:2px;background:white;border-radius:999px;transition:.2s ease;box-shadow:0 10px 20px rgba(0,0,0,.35)}
+    .switch input:checked + .slider{background:rgba(34,197,94,.35);border-color:rgba(34,197,94,.5)}
+    .switch input:checked + .slider:before{transform:translateX(22px)}
 
-    /* Logs */
-    .logList{display:flex; flex-direction:column; gap:10px; margin-top:10px}
-    .logItem{
-      padding:12px;
-      border:1px solid var(--border);
-      border-radius: 14px;
-      background: rgba(0,0,0,.12);
-    }
-    .logTop{display:flex; align-items:center; justify-content:space-between; gap:10px}
-    .badge{
-      font-size:11px;
-      padding:4px 8px;
-      border-radius:999px;
-      border:1px solid var(--border);
-      background: rgba(255,255,255,.06);
-      color:#f3f4f6;
-      text-transform:uppercase;
-      letter-spacing:.6px;
-    }
-    .time{font-size:11px; color:var(--muted)}
-    .msg{margin-top:6px; font-size:12px; color:#d1d5db; line-height:1.35; word-break:break-word}
+    .logList{display:flex;flex-direction:column;gap:10px;margin-top:10px}
+    .logItem{padding:12px;border:1px solid var(--border);border-radius:14px;background:rgba(0,0,0,.12)}
+    .logTop{display:flex;align-items:center;justify-content:space-between;gap:10px}
+    .badge{font-size:11px;padding:4px 8px;border-radius:999px;border:1px solid var(--border);background:rgba(255,255,255,.06);text-transform:uppercase;letter-spacing:.6px}
+    .time{font-size:11px;color:var(--muted)}
+    .msg{margin-top:6px;font-size:12px;color:#d1d5db;line-height:1.35;word-break:break-word}
 
-    /* Fullscreen loader */
-    .overlay{
-      position:fixed; inset:0; display:none;
-      background: rgba(0,0,0,.35);
-      backdrop-filter: blur(6px);
-      align-items:center; justify-content:center;
-      z-index:50;
-    }
+    .overlay{position:fixed;inset:0;display:none;background:rgba(0,0,0,.35);backdrop-filter:blur(6px);align-items:center;justify-content:center;z-index:50}
     .overlay.show{display:flex}
-    .spinner{
-      width:46px; height:46px;
-      border:4px solid rgba(255,255,255,.18);
-      border-top-color: rgba(124,58,237,1);
-      border-radius:999px;
-      animation: spin .8s linear infinite;
-      box-shadow: 0 16px 30px rgba(0,0,0,.35);
-    }
+    .spinner{width:46px;height:46px;border:4px solid rgba(255,255,255,.18);border-top-color:rgba(124,58,237,1);border-radius:999px;animation:spin .8s linear infinite}
     @keyframes spin{to{transform:rotate(360deg)}}
 
-    /* Toast */
-    .toastWrap{
-      position:fixed; right:14px; bottom:14px;
-      display:flex; flex-direction:column; gap:10px;
-      z-index:60;
-    }
-    .toast{
-      min-width: 240px;
-      max-width: 360px;
-      padding:12px 12px;
-      border-radius: 14px;
-      border:1px solid var(--border);
-      background: rgba(15,23,42,.9);
-      box-shadow: var(--shadow);
-      animation: pop .18s ease;
-    }
-    @keyframes pop{from{transform: translateY(6px); opacity:.7}to{transform: translateY(0); opacity:1}}
-    .toast .t{font-weight:700; font-size:13px}
-    .toast .d{color:var(--muted); font-size:12px; margin-top:4px; line-height:1.35}
-    .toast.ok{border-color: rgba(34,197,94,.45)}
-    .toast.err{border-color: rgba(239,68,68,.55)}
+    .toastWrap{position:fixed;right:14px;bottom:14px;display:flex;flex-direction:column;gap:10px;z-index:60}
+    .toast{min-width:240px;max-width:360px;padding:12px;border-radius:14px;border:1px solid var(--border);background:rgba(15,23,42,.9);box-shadow:var(--shadow)}
+    .toast .t{font-weight:700;font-size:13px}
+    .toast .d{color:var(--muted);font-size:12px;margin-top:4px;line-height:1.35}
+    .toast.ok{border-color:rgba(34,197,94,.45)}
+    .toast.err{border-color:rgba(239,68,68,.55)}
   </style>
 </head>
 <body>
@@ -206,26 +108,21 @@
         <div class="logo"></div>
         <div>
           <h1>AI YouTube Shorts SaaS</h1>
-          <div class="sub">Session-based Google OAuth · Settings persist · Worker automation</div>
+          <div class="sub">Backend: automation-yt-saas.onrender.com</div>
         </div>
       </div>
-
       <div class="actions">
         <button class="btn" id="btnRefresh">Refresh</button>
-        <button class="btn danger" id="btnLogout" style="display:none;">Logout</button>
+        <a class="btn primary" id="btnLogin" href="#" style="display:none;">Login with Google</a>
       </div>
     </div>
 
     <div id="authGate" class="card" style="display:none;">
       <h2>Login Required</h2>
-      <p class="muted">You are not authenticated. Login with Google to access your dashboard.</p>
-      <div class="actions">
-        <a class="btn primary" id="btnLogin" href="/auth/google">Login with Google</a>
-      </div>
+      <p class="muted">You are not authenticated. Please login with Google.</p>
     </div>
 
     <div id="app" class="grid" style="display:none;">
-      <!-- Settings -->
       <div class="card">
         <h2>Settings</h2>
 
@@ -238,7 +135,6 @@
               <option value="success">Success</option>
             </select>
           </div>
-
           <div>
             <label for="bgType">Background</label>
             <select id="bgType">
@@ -253,20 +149,16 @@
           <div>
             <label for="postsPerDay">Posts per day (1–8)</label>
             <input id="postsPerDay" type="number" min="1" max="8" step="1" value="1" />
-            <div class="muted" style="margin-top:6px;">
-              Automation interval is calculated as 24 / postsPerDay hours.
-            </div>
+            <div class="muted" style="margin-top:6px;">Automation interval = 24 / postsPerDay hours.</div>
           </div>
-
           <div>
             <label>Automation</label>
             <div class="toggleRow">
               <div>
                 <strong id="autoLabel">Disabled</strong>
-                <div class="muted">Enable to let the worker upload automatically.</div>
+                <div class="muted">Enable to allow automated uploads.</div>
               </div>
-
-              <label class="switch" title="Enable automation">
+              <label class="switch">
                 <input id="autoMode" type="checkbox" />
                 <span class="slider"></span>
               </label>
@@ -278,275 +170,198 @@
           <button class="btn primary" id="btnSave">Save Settings</button>
           <button class="btn success" id="btnGenerate">Generate Now</button>
         </div>
-
-        <div class="muted" style="margin-top:12px;">
-          Tip: If YouTube upload fails, reconnect your YouTube account in your OAuth flow.
-        </div>
       </div>
 
-      <!-- Logs -->
       <div class="card">
         <h2>Latest Logs</h2>
-        <div class="muted">Last 5 events from generation/worker.</div>
+        <div class="muted">Last 5 events.</div>
         <div class="logList" id="logList"></div>
       </div>
     </div>
   </div>
 
-  <div class="overlay" id="overlay">
-    <div class="spinner"></div>
-  </div>
-
+  <div class="overlay" id="overlay"><div class="spinner"></div></div>
   <div class="toastWrap" id="toastWrap"></div>
 
   <script>
-    // -----------------------------
-    // Small utilities
-    // -----------------------------
+    // ✅ Backend base URL
+    const API_BASE = "https://automation-yt-saas.onrender.com";
+
     const $ = (id) => document.getElementById(id);
 
-    function setLoading(on) {
-      $('overlay').classList.toggle('show', !!on);
-      $('btnSave').disabled = !!on;
-      $('btnGenerate').disabled = !!on;
-      $('btnRefresh').disabled = !!on;
-      $('autoMode').disabled = !!on;
-      $('contentType').disabled = !!on;
-      $('bgType').disabled = !!on;
-      $('postsPerDay').disabled = !!on;
-    }
-
-    function toast(type, title, detail) {
-      const el = document.createElement('div');
-      el.className = 'toast ' + (type === 'ok' ? 'ok' : 'err');
-      el.innerHTML = '<div class="t"></div><div class="d"></div>';
-      el.querySelector('.t').textContent = title || (type === 'ok' ? 'Success' : 'Error');
-      el.querySelector('.d').textContent = detail || '';
-      $('toastWrap').appendChild(el);
-      setTimeout(() => {
-        el.style.opacity = '0';
-        el.style.transform = 'translateY(6px)';
-        el.style.transition = 'all .2s ease';
-        setTimeout(() => el.remove(), 220);
-      }, 2600);
-    }
-
-    function fmtTime(ts) {
-      try {
-        const d = new Date(ts);
-        return d.toLocaleString();
-      } catch {
-        return String(ts || '');
-      }
-    }
-
-    async function api(path, opts = {}) {
-      const res = await fetch(path, {
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json', ...(opts.headers || {}) },
-        ...opts,
+    function setLoading(on){
+      $("overlay").classList.toggle("show", !!on);
+      ["btnSave","btnGenerate","btnRefresh","autoMode","contentType","bgType","postsPerDay"].forEach(id=>{
+        const el = $(id);
+        if (el) el.disabled = !!on;
       });
-      const ct = (res.headers.get('content-type') || '').toLowerCase();
-      const data = ct.includes('application/json') ? await res.json().catch(() => ({})) : await res.text();
-      if (!res.ok) {
-        const msg = (data && data.error) ? data.error : (typeof data === 'string' ? data : 'Request failed');
-        const err = new Error(msg);
-        err.status = res.status;
-        err.data = data;
-        throw err;
+    }
+
+    function toast(type, title, detail){
+      const el = document.createElement("div");
+      el.className = "toast " + (type === "ok" ? "ok" : "err");
+      el.innerHTML = `<div class="t"></div><div class="d"></div>`;
+      el.querySelector(".t").textContent = title || (type === "ok" ? "Success" : "Error");
+      el.querySelector(".d").textContent = detail || "";
+      $("toastWrap").appendChild(el);
+      setTimeout(()=>el.remove(), 2600);
+    }
+
+    async function api(path, opts = {}){
+      const res = await fetch(API_BASE + path, {
+        credentials: "include",
+        headers: { "Content-Type":"application/json", ...(opts.headers || {}) },
+        ...opts
+      });
+
+      const ct = (res.headers.get("content-type") || "").toLowerCase();
+      const data = ct.includes("application/json") ? await res.json().catch(()=>({})) : await res.text();
+
+      if (!res.ok){
+        const msg = (data && data.error) ? data.error : (typeof data === "string" ? data : "Request failed");
+        throw new Error(msg);
       }
       return data;
     }
 
-    // -----------------------------
-    // UI state setters
-    // -----------------------------
-    function setAutoUI(enabled) {
-      $('autoMode').checked = !!enabled;
-      $('autoLabel').textContent = enabled ? 'Enabled' : 'Disabled';
-      $('autoLabel').style.color = enabled ? '#86efac' : '#fca5a5';
-    }
-
-    function clampPostsPerDay(v) {
+    function clampPostsPerDay(v){
       const n = Number(v);
       if (!Number.isFinite(n)) return 1;
       return Math.min(8, Math.max(1, Math.round(n)));
     }
 
-    // -----------------------------
-    // Data loaders
-    // -----------------------------
-    async function checkAuth() {
-      // Expect /auth/status returns something like: { authenticated: true/false, user?: {...} }
-      const s = await api('/auth/status', { method: 'GET' });
+    function setAutoUI(enabled){
+      $("autoMode").checked = !!enabled;
+      $("autoLabel").textContent = enabled ? "Enabled" : "Disabled";
+      $("autoLabel").style.color = enabled ? "#86efac" : "#fca5a5";
+    }
+
+    async function checkAuth(){
+      // if your backend returns a different shape, tell me and I'll adjust
+      const s = await api("/auth/status", { method:"GET" });
       return !!(s && (s.authenticated || s.loggedIn || s.ok));
     }
 
-    async function loadProfileIntoUI() {
-      const p = await api('/profile', { method: 'GET' });
-
-      // You may return { user: {...} } or direct object; support both.
+    async function loadProfile(){
+      const p = await api("/profile", { method:"GET" });
       const u = p.user || p;
 
-      if (u.contentType) $('contentType').value = u.contentType;
-      if (u.bgType) $('bgType').value = u.bgType;
-      if (u.postsPerDay != null) $('postsPerDay').value = clampPostsPerDay(u.postsPerDay);
+      if (u.contentType) $("contentType").value = u.contentType;
+      if (u.bgType) $("bgType").value = u.bgType;
+      if (u.postsPerDay != null) $("postsPerDay").value = clampPostsPerDay(u.postsPerDay);
 
       setAutoUI(!!u.autoMode);
     }
 
-    async function loadLogs() {
-      const data = await api('/logs', { method: 'GET' });
-      const logs = (data.logs || data || []);
-      const last5 = Array.isArray(logs) ? logs.slice(0, 5) : [];
+    function fmtTime(ts){
+      try { return new Date(ts).toLocaleString(); } catch { return String(ts||""); }
+    }
 
-      const list = $('logList');
-      list.innerHTML = '';
+    function escapeHtml(str){
+      return String(str||"")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
 
-      if (last5.length === 0) {
-        const empty = document.createElement('div');
-        empty.className = 'logItem';
-        empty.innerHTML = '<div class="muted">No logs yet.</div>';
+    async function loadLogs(){
+      const data = await api("/logs", { method:"GET" });
+      const logs = data.logs || data || [];
+      const last5 = Array.isArray(logs) ? logs.slice(0,5) : [];
+
+      const list = $("logList");
+      list.innerHTML = "";
+
+      if (last5.length === 0){
+        const empty = document.createElement("div");
+        empty.className = "logItem";
+        empty.innerHTML = `<div class="muted">No logs yet.</div>`;
         list.appendChild(empty);
         return;
       }
 
-      for (const item of last5) {
-        const el = document.createElement('div');
-        el.className = 'logItem';
-        const status = (item.status || 'unknown').toString();
-        const msg = (item.message || '').toString();
-        const time = item.timestamp || item.time || item.createdAt || '';
-
+      for (const item of last5){
+        const el = document.createElement("div");
+        el.className = "logItem";
         el.innerHTML = `
           <div class="logTop">
-            <span class="badge">${status}</span>
-            <span class="time">${fmtTime(time)}</span>
+            <span class="badge">${escapeHtml(item.status || "unknown")}</span>
+            <span class="time">${escapeHtml(fmtTime(item.timestamp || item.time || item.createdAt || ""))}</span>
           </div>
-          <div class="msg">${escapeHtml(msg)}</div>
+          <div class="msg">${escapeHtml(item.message || "")}</div>
         `;
         list.appendChild(el);
       }
     }
 
-    function escapeHtml(str) {
-      return String(str || '')
-        .replaceAll('&', '&amp;')
-        .replaceAll('<', '&lt;')
-        .replaceAll('>', '&gt;')
-        .replaceAll('"', '&quot;')
-        .replaceAll("'", '&#039;');
+    async function saveAll(){
+      const contentType = $("contentType").value;
+      const bgType = $("bgType").value;
+      const postsPerDay = clampPostsPerDay($("postsPerDay").value);
+      const enabled = $("autoMode").checked;
+
+      await api("/profile", { method:"PATCH", body: JSON.stringify({ contentType, bgType, postsPerDay }) });
+      await api("/auto", { method:"POST", body: JSON.stringify({ enabled }) });
+
+      toast("ok","Saved successfully","Your settings were updated.");
     }
 
-    // -----------------------------
-    // Save actions
-    // -----------------------------
-    async function saveAll() {
-      const contentType = $('contentType').value;
-      const bgType = $('bgType').value;
-      const postsPerDay = clampPostsPerDay($('postsPerDay').value);
-      const enabled = $('autoMode').checked;
-
-      // 1) Save profile settings
-      await api('/profile', {
-        method: 'PATCH',
-        body: JSON.stringify({ contentType, bgType, postsPerDay }),
-      });
-
-      // 2) Save automation toggle
-      await api('/auto', {
-        method: 'POST',
-        body: JSON.stringify({ enabled }),
-      });
-
-      toast('ok', 'Saved successfully', 'Your settings were updated.');
+    async function generateNow(){
+      await api("/generate", { method:"POST", body: JSON.stringify({}) });
+      toast("ok","Generation started","Check logs for progress.");
+      await loadLogs().catch(()=>{});
     }
 
-    async function generateNow() {
-      await api('/generate', { method: 'POST', body: JSON.stringify({}) });
-      toast('ok', 'Generation started', 'Check logs for progress.');
-      await loadLogs().catch(() => {});
-    }
-
-    // -----------------------------
-    // App bootstrap
-    // -----------------------------
-    async function boot() {
+    async function boot(){
       setLoading(true);
       try {
+        // login button points to backend OAuth route
+        $("btnLogin").href = API_BASE + "/auth/google";
+
         const authed = await checkAuth();
 
-        if (!authed) {
-          $('authGate').style.display = 'block';
-          $('app').style.display = 'none';
-          $('btnLogout').style.display = 'none';
+        if (!authed){
+          $("authGate").style.display = "block";
+          $("app").style.display = "none";
+          $("btnLogin").style.display = "inline-block";
           return;
         }
 
-        $('authGate').style.display = 'none';
-        $('app').style.display = 'grid';
-        $('btnLogout').style.display = 'inline-block';
+        $("authGate").style.display = "none";
+        $("app").style.display = "grid";
+        $("btnLogin").style.display = "none";
 
-        // ✅ FIX: load saved settings so refresh does not reset
-        await loadProfileIntoUI();
+        await loadProfile();   // ✅ fixes reset after refresh
         await loadLogs();
       } catch (e) {
-        toast('err', 'Failed to load', e.message || 'Unknown error');
-        $('authGate').style.display = 'block';
-        $('app').style.display = 'none';
+        toast("err","Failed to load", e.message || "Unknown error");
+        $("authGate").style.display = "block";
+        $("app").style.display = "none";
+        $("btnLogin").style.display = "inline-block";
       } finally {
         setLoading(false);
       }
     }
 
-    // -----------------------------
-    // Event bindings
-    // -----------------------------
-    $('btnRefresh').addEventListener('click', () => boot());
+    $("btnRefresh").addEventListener("click", boot);
+    $("autoMode").addEventListener("change", ()=> setAutoUI($("autoMode").checked));
 
-    $('autoMode').addEventListener('change', () => {
-      setAutoUI($('autoMode').checked);
-    });
-
-    $('btnSave').addEventListener('click', async () => {
+    $("btnSave").addEventListener("click", async ()=>{
       setLoading(true);
-      try {
-        await saveAll();
-        await loadLogs().catch(() => {});
-      } catch (e) {
-        toast('err', 'Save failed', e.message || 'Unknown error');
-      } finally {
-        setLoading(false);
-      }
+      try { await saveAll(); await loadLogs().catch(()=>{}); }
+      catch(e){ toast("err","Save failed", e.message || "Unknown error"); }
+      finally { setLoading(false); }
     });
 
-    $('btnGenerate').addEventListener('click', async () => {
+    $("btnGenerate").addEventListener("click", async ()=>{
       setLoading(true);
-      try {
-        await generateNow();
-      } catch (e) {
-        toast('err', 'Generate failed', e.message || 'Unknown error');
-      } finally {
-        setLoading(false);
-      }
+      try { await generateNow(); }
+      catch(e){ toast("err","Generate failed", e.message || "Unknown error"); }
+      finally { setLoading(false); }
     });
 
-    $('btnLogout').addEventListener('click', async () => {
-      // If you have /auth/logout route, call it. Otherwise just tell user.
-      setLoading(true);
-      try {
-        // Best effort; if route doesn't exist, it will error and we show message.
-        await api('/auth/logout', { method: 'POST', body: JSON.stringify({}) });
-        toast('ok', 'Logged out', 'Session ended.');
-      } catch (e) {
-        toast('err', 'Logout', 'If logout endpoint is not implemented, clear cookies manually.');
-      } finally {
-        setLoading(false);
-        boot();
-      }
-    });
-
-    // Start
     boot();
   </script>
 </body>
