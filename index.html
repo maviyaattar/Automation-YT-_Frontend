@@ -3,1590 +3,551 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="AutoShorts AI — Automated YouTube Shorts creation powered by AI" />
-  <meta name="theme-color" content="#6366f1" />
-
-  <!-- Open Graph -->
-  <meta property="og:title" content="AutoShorts AI" />
-  <meta property="og:description" content="AI-powered YouTube Shorts automation platform" />
-  <meta property="og:type" content="website" />
-
-  <title>AutoShorts AI</title>
-
-  <!-- Inline favicon: gradient play-button icon -->
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%236366f1'/><path d='M35 28L72 50L35 72V28Z' fill='white'/></svg>" />
-
-  <!-- =====================================================================
-       EMBEDDED CSS — All styles are self-contained in this block.
-       Sections: CSS variables, reset, layout, login screen, dashboard,
-                 cards, forms, buttons, logs, toast, spinner, responsive.
-       ===================================================================== -->
+  <title>AI Shorts SaaS Dashboard</title>
   <style>
-    /* ── CSS custom properties (design tokens) ──────────────────────────── */
-    :root {
-      --brand:        #6366f1;       /* primary indigo */
-      --brand-light:  #818cf8;
-      --brand-dark:   #4f46e5;
-      --accent:       #ec4899;       /* pink accent */
-      --bg:           #0f0f1a;       /* dark page background */
-      --surface:      rgba(255,255,255,0.06);  /* glass card surface */
-      --surface-hover:rgba(255,255,255,0.10);
-      --border:       rgba(255,255,255,0.10);
-      --text:         #e2e8f0;
-      --text-muted:   #94a3b8;
-      --success:      #22c55e;
-      --error:        #ef4444;
-      --warning:      #f59e0b;
-      --radius:       14px;
-      --radius-sm:    8px;
-      --shadow:       0 8px 32px rgba(0,0,0,0.4);
-      --transition:   0.2s ease;
+    :root{
+      --bg1:#0b1220;
+      --bg2:#0f1b33;
+      --card:#0f172a;
+      --card2:#111c34;
+      --text:#e5e7eb;
+      --muted:#9ca3af;
+      --primary:#7c3aed;
+      --primary2:#22c55e;
+      --danger:#ef4444;
+      --border:rgba(255,255,255,.08);
+      --shadow: 0 18px 45px rgba(0,0,0,.45);
+      --radius: 18px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: radial-gradient(1200px 600px at 20% 10%, rgba(124,58,237,.35), transparent 60%),
+                  radial-gradient(900px 500px at 80% 30%, rgba(34,197,94,.18), transparent 55%),
+                  linear-gradient(160deg,var(--bg1),var(--bg2));
+      color:var(--text);
+      min-height:100vh;
     }
 
-    /* ── Reset & base ────────────────────────────────────────────────────── */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    .wrap{max-width:1100px;margin:0 auto;padding:28px 16px 40px}
+    .topbar{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:12px; margin-bottom:18px;
+    }
+    .brand{
+      display:flex; align-items:center; gap:12px;
+    }
+    .logo{
+      width:44px; height:44px; border-radius:14px;
+      background: linear-gradient(135deg, rgba(124,58,237,1), rgba(34,197,94,1));
+      box-shadow: 0 10px 25px rgba(124,58,237,.25);
+    }
+    h1{font-size:18px;margin:0}
+    .sub{color:var(--muted);font-size:13px;margin-top:2px}
 
-    html { height: 100%; }
-
-    body {
-      min-height: 100%;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.6;
-      /* Subtle animated gradient mesh in the background */
-      background-image:
-        radial-gradient(ellipse 80% 60% at 20% 20%, rgba(99,102,241,0.18) 0%, transparent 60%),
-        radial-gradient(ellipse 60% 50% at 80% 80%, rgba(236,72,153,0.12) 0%, transparent 55%);
+    .grid{
+      display:grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap:16px;
+    }
+    @media (max-width: 900px){
+      .grid{grid-template-columns:1fr}
     }
 
-    /* ── Utility helpers ─────────────────────────────────────────────────── */
-    .hidden  { display: none !important; }
-    .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
-
-    /* Focus ring — keyboard accessibility */
-    :focus-visible {
-      outline: 2px solid var(--brand-light);
-      outline-offset: 2px;
-    }
-
-    /* ── Spinner keyframe ────────────────────────────────────────────────── */
-    @keyframes spin { to { transform: rotate(360deg); } }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
-    @keyframes slideDown { from { opacity: 0; transform: translateY(-12px); } to { opacity: 1; transform: none; } }
-
-    .spinner {
-      display: inline-block;
-      width: 20px; height: 20px;
-      border: 2px solid rgba(255,255,255,0.3);
-      border-top-color: #fff;
-      border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-      vertical-align: middle;
-      margin-right: 8px;
-    }
-    .spinner-lg {
-      width: 40px; height: 40px;
-      border-width: 3px;
-    }
-
-    /* ── Glass card mixin ────────────────────────────────────────────────── */
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+      border:1px solid var(--border);
       border-radius: var(--radius);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
       box-shadow: var(--shadow);
-      padding: 28px;
-      animation: fadeIn 0.3s ease both;
+      padding:18px;
+    }
+    .card h2{
+      margin:0 0 12px;
+      font-size:14px;
+      letter-spacing:.2px;
+      color:#f3f4f6;
     }
 
-    /* ── Gradient button base ────────────────────────────────────────────── */
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      padding: 11px 22px;
-      border: none;
-      border-radius: var(--radius-sm);
-      font-size: 0.9rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: transform var(--transition), box-shadow var(--transition), opacity var(--transition);
-      text-decoration: none;
-      white-space: nowrap;
-    }
-    .btn:active { transform: scale(0.97); }
-    .btn:disabled { opacity: 0.55; cursor: not-allowed; pointer-events: none; }
+    .row{display:grid; grid-template-columns: 1fr 1fr; gap:12px}
+    @media (max-width:520px){ .row{grid-template-columns:1fr} }
 
-    .btn-primary {
-      background: linear-gradient(135deg, var(--brand) 0%, var(--brand-dark) 100%);
-      color: #fff;
-      box-shadow: 0 4px 18px rgba(99,102,241,0.45);
+    label{display:block;font-size:12px;color:var(--muted); margin:10px 0 6px}
+    select,input{
+      width:100%;
+      padding:12px 12px;
+      border-radius: 12px;
+      border:1px solid var(--border);
+      background: rgba(0,0,0,.18);
+      color:var(--text);
+      outline:none;
+      transition:.18s ease;
     }
-    .btn-primary:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 24px rgba(99,102,241,0.60);
-    }
+    select:focus,input:focus{border-color: rgba(124,58,237,.6); box-shadow:0 0 0 4px rgba(124,58,237,.18)}
+    input[type="number"]{appearance:textfield}
 
-    .btn-accent {
-      background: linear-gradient(135deg, var(--accent) 0%, #be185d 100%);
-      color: #fff;
-      box-shadow: 0 4px 18px rgba(236,72,153,0.40);
+    .actions{display:flex; gap:10px; flex-wrap:wrap; margin-top:14px}
+    .btn{
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.06);
+      color:var(--text);
+      padding:11px 14px;
+      border-radius: 14px;
+      cursor:pointer;
+      font-weight:600;
+      transition: transform .12s ease, background .18s ease, border-color .18s ease, opacity .18s ease;
+      user-select:none;
     }
-    .btn-accent:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 24px rgba(236,72,153,0.55);
-    }
+    .btn:hover{transform: translateY(-1px); background: rgba(255,255,255,.09)}
+    .btn:disabled{opacity:.55; cursor:not-allowed; transform:none}
+    .btn.primary{background: linear-gradient(135deg, rgba(124,58,237,.9), rgba(124,58,237,.55)); border-color: rgba(124,58,237,.55)}
+    .btn.primary:hover{background: linear-gradient(135deg, rgba(124,58,237,1), rgba(124,58,237,.65))}
+    .btn.success{background: linear-gradient(135deg, rgba(34,197,94,.85), rgba(34,197,94,.45)); border-color: rgba(34,197,94,.55)}
+    .btn.danger{background: linear-gradient(135deg, rgba(239,68,68,.85), rgba(239,68,68,.45)); border-color: rgba(239,68,68,.55)}
 
-    .btn-ghost {
-      background: transparent;
-      color: var(--text-muted);
-      border: 1px solid var(--border);
-    }
-    .btn-ghost:hover:not(:disabled) {
-      background: var(--surface-hover);
-      color: var(--text);
-    }
+    .muted{color:var(--muted);font-size:12px;line-height:1.45}
 
-    .btn-danger {
-      background: linear-gradient(135deg, var(--error) 0%, #b91c1c 100%);
-      color: #fff;
+    /* Toggle */
+    .toggleRow{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:10px; padding:12px; border-radius:14px; border:1px solid var(--border); background: rgba(0,0,0,.12)}
+    .toggleRow strong{font-size:13px}
+    .switch{position:relative; width:52px; height:30px; flex:0 0 auto}
+    .switch input{display:none}
+    .slider{
+      position:absolute; inset:0;
+      background: rgba(255,255,255,.15);
+      border:1px solid var(--border);
+      border-radius:999px;
+      transition:.2s ease;
     }
-    .btn-danger:hover:not(:disabled) { transform: translateY(-2px); }
+    .slider:before{
+      content:"";
+      position:absolute;
+      height:24px; width:24px;
+      left:3px; top:2px;
+      background:white;
+      border-radius:999px;
+      transition:.2s ease;
+      box-shadow: 0 10px 20px rgba(0,0,0,.35);
+    }
+    .switch input:checked + .slider{
+      background: rgba(34,197,94,.35);
+      border-color: rgba(34,197,94,.5);
+    }
+    .switch input:checked + .slider:before{transform: translateX(22px)}
 
-    .btn-sm { padding: 7px 14px; font-size: 0.82rem; }
-    .btn-full { width: 100%; }
+    /* Logs */
+    .logList{display:flex; flex-direction:column; gap:10px; margin-top:10px}
+    .logItem{
+      padding:12px;
+      border:1px solid var(--border);
+      border-radius: 14px;
+      background: rgba(0,0,0,.12);
+    }
+    .logTop{display:flex; align-items:center; justify-content:space-between; gap:10px}
+    .badge{
+      font-size:11px;
+      padding:4px 8px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.06);
+      color:#f3f4f6;
+      text-transform:uppercase;
+      letter-spacing:.6px;
+    }
+    .time{font-size:11px; color:var(--muted)}
+    .msg{margin-top:6px; font-size:12px; color:#d1d5db; line-height:1.35; word-break:break-word}
 
-    /* ── Form elements ───────────────────────────────────────────────────── */
-    .form-group { margin-bottom: 18px; }
+    /* Fullscreen loader */
+    .overlay{
+      position:fixed; inset:0; display:none;
+      background: rgba(0,0,0,.35);
+      backdrop-filter: blur(6px);
+      align-items:center; justify-content:center;
+      z-index:50;
+    }
+    .overlay.show{display:flex}
+    .spinner{
+      width:46px; height:46px;
+      border:4px solid rgba(255,255,255,.18);
+      border-top-color: rgba(124,58,237,1);
+      border-radius:999px;
+      animation: spin .8s linear infinite;
+      box-shadow: 0 16px 30px rgba(0,0,0,.35);
+    }
+    @keyframes spin{to{transform:rotate(360deg)}}
 
-    label {
-      display: block;
-      font-size: 0.82rem;
-      font-weight: 600;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin-bottom: 7px;
+    /* Toast */
+    .toastWrap{
+      position:fixed; right:14px; bottom:14px;
+      display:flex; flex-direction:column; gap:10px;
+      z-index:60;
     }
-
-    select, input[type="text"], input[type="email"] {
-      width: 100%;
-      padding: 10px 14px;
-      background: rgba(255,255,255,0.07);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      color: var(--text);
-      font-size: 0.92rem;
-      transition: border-color var(--transition), background var(--transition);
-      appearance: none;
-      -webkit-appearance: none;
-    }
-    select:focus, input[type="text"]:focus, input[type="email"]:focus {
-      border-color: var(--brand-light);
-      background: rgba(255,255,255,0.10);
-      outline: none;
-    }
-    /* Custom chevron for selects */
-    select {
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 12px center;
-      padding-right: 36px;
-    }
-    select option { background: #1e1e2e; color: var(--text); }
-
-    /* ── Section headings ───────────────────────────────────────────────── */
-    .section-title {
-      font-size: 1.15rem;
-      font-weight: 700;
-      color: var(--text);
-      margin-bottom: 20px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .section-title svg { width: 20px; height: 20px; color: var(--brand-light); }
-
-    /* ── Status badge ────────────────────────────────────────────────────── */
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 3px 10px;
-      border-radius: 999px;
-      font-size: 0.75rem;
-      font-weight: 600;
-    }
-    .badge-success { background: rgba(34,197,94,0.15); color: var(--success); }
-    .badge-error   { background: rgba(239,68,68,0.15);  color: var(--error); }
-    .badge-warn    { background: rgba(245,158,11,0.15); color: var(--warning); }
-    .badge-info    { background: rgba(99,102,241,0.15); color: var(--brand-light); }
-
-    /* ── Inline status message (below buttons) ───────────────────────────── */
-    .status-msg {
-      font-size: 0.84rem;
-      margin-top: 10px;
-      padding: 9px 14px;
-      border-radius: var(--radius-sm);
-      animation: slideDown 0.2s ease;
-    }
-    .status-msg.success { background: rgba(34,197,94,0.12); color: var(--success); border-left: 3px solid var(--success); }
-    .status-msg.error   { background: rgba(239,68,68,0.12);  color: var(--error);   border-left: 3px solid var(--error); }
-    .status-msg.info    { background: rgba(99,102,241,0.12); color: var(--brand-light); border-left: 3px solid var(--brand-light); }
-
-    /* ── Toast notifications ─────────────────────────────────────────────── */
-    #toast-area {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      z-index: 9999;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      pointer-events: none;
-    }
-    .toast {
-      min-width: 260px;
+    .toast{
+      min-width: 240px;
       max-width: 360px;
-      padding: 12px 18px;
-      border-radius: var(--radius-sm);
-      font-size: 0.88rem;
-      font-weight: 500;
+      padding:12px 12px;
+      border-radius: 14px;
+      border:1px solid var(--border);
+      background: rgba(15,23,42,.9);
       box-shadow: var(--shadow);
-      animation: slideDown 0.25s ease;
-      pointer-events: auto;
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+      animation: pop .18s ease;
     }
-    .toast-success { background: rgba(16,28,16,0.92); border-left: 4px solid var(--success); color: #86efac; }
-    .toast-error   { background: rgba(28,14,14,0.92); border-left: 4px solid var(--error);   color: #fca5a5; }
-    .toast-info    { background: rgba(14,16,30,0.92); border-left: 4px solid var(--brand);   color: var(--brand-light); }
-
-    /* ── LOGIN SCREEN ────────────────────────────────────────────────────── */
-    #login-screen {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
-    }
-    .login-card {
-      width: 100%;
-      max-width: 420px;
-      text-align: center;
-    }
-    .login-logo {
-      width: 72px; height: 72px;
-      background: linear-gradient(135deg, var(--brand) 0%, var(--accent) 100%);
-      border-radius: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 24px;
-      box-shadow: 0 8px 30px rgba(99,102,241,0.5);
-    }
-    .login-logo svg { width: 36px; height: 36px; color: #fff; }
-    .login-card h1 { font-size: 1.9rem; font-weight: 800; margin-bottom: 6px; }
-    .login-card h1 span { background: linear-gradient(135deg,var(--brand-light),var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .login-card p  { color: var(--text-muted); margin-bottom: 32px; font-size: 0.95rem; }
-    .google-btn {
-      background: #fff;
-      color: #1f1f1f;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-      font-size: 0.95rem;
-    }
-    .google-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.35); }
-    .google-btn svg { flex-shrink: 0; }
-
-    /* ── LOADING SCREEN (auth check) ──────────────────────────────────────── */
-    #loading-screen {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 16px;
-      color: var(--text-muted);
-    }
-
-    /* ── DASHBOARD LAYOUT ────────────────────────────────────────────────── */
-    #dashboard {
-      display: flex;
-      min-height: 100vh;
-    }
-
-    /* Sidebar */
-    .sidebar {
-      width: 240px;
-      flex-shrink: 0;
-      padding: 24px 16px;
-      background: rgba(15,15,26,0.85);
-      border-right: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      position: sticky;
-      top: 0;
-      height: 100vh;
-      overflow-y: auto;
-    }
-    .sidebar-brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 8px 10px 28px;
-      text-decoration: none;
-    }
-    .sidebar-brand-icon {
-      width: 38px; height: 38px;
-      background: linear-gradient(135deg,var(--brand),var(--accent));
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-    .sidebar-brand-icon svg { width: 20px; height: 20px; color: #fff; }
-    .sidebar-brand-text { font-size: 0.92rem; font-weight: 700; color: var(--text); line-height: 1.2; }
-    .sidebar-brand-sub  { font-size: 0.72rem; color: var(--text-muted); }
-
-    .nav-section-label {
-      font-size: 0.68rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--text-muted);
-      padding: 0 10px;
-      margin-bottom: 6px;
-      margin-top: 18px;
-    }
-    .nav-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 12px;
-      border-radius: var(--radius-sm);
-      color: var(--text-muted);
-      text-decoration: none;
-      font-size: 0.9rem;
-      font-weight: 500;
-      cursor: pointer;
-      border: none;
-      background: none;
-      width: 100%;
-      text-align: left;
-      transition: background var(--transition), color var(--transition);
-    }
-    .nav-item svg { width: 18px; height: 18px; flex-shrink: 0; }
-    .nav-item:hover, .nav-item.active {
-      background: rgba(99,102,241,0.15);
-      color: var(--brand-light);
-    }
-    .nav-item.active { font-weight: 600; }
-
-    .sidebar-spacer { flex: 1; }
-    .sidebar-footer { padding-top: 16px; border-top: 1px solid var(--border); }
-
-    /* Main content column (wraps mobile-header + main on right of sidebar) */
-    .content-col {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      min-width: 0;
-    }
-
-    /* Main content */
-    .main-content {
-      flex: 1;
-      padding: 32px;
-      overflow-y: auto;
-      max-width: 860px;
-    }
-
-    /* Page header */
-    .page-header {
-      margin-bottom: 28px;
-      animation: fadeIn 0.3s ease;
-    }
-    .page-header h2 {
-      font-size: 1.7rem;
-      font-weight: 800;
-    }
-    .page-header p  { color: var(--text-muted); margin-top: 4px; }
-
-    /* ── User info card ──────────────────────────────────────────────────── */
-    .user-info-card {
-      display: flex;
-      align-items: center;
-      gap: 18px;
-      margin-bottom: 24px;
-    }
-    .user-avatar {
-      width: 54px; height: 54px;
-      border-radius: 50%;
-      background: linear-gradient(135deg,var(--brand),var(--accent));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.4rem;
-      font-weight: 700;
-      color: #fff;
-      flex-shrink: 0;
-    }
-    .user-details h3 { font-size: 1.1rem; font-weight: 700; }
-    .user-details p  { font-size: 0.84rem; color: var(--text-muted); }
-
-    /* ── Section tabs (mobile nav) ──────────────────────────────────────── */
-    .section-tabs {
-      display: none; /* shown via media query */
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-bottom: 24px;
-    }
-    .tab-btn {
-      padding: 8px 16px;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      background: var(--surface);
-      color: var(--text-muted);
-      font-size: 0.85rem;
-      cursor: pointer;
-      transition: all var(--transition);
-    }
-    .tab-btn.active, .tab-btn:hover {
-      background: rgba(99,102,241,0.18);
-      border-color: var(--brand);
-      color: var(--brand-light);
-    }
-
-    /* ── Logs list ───────────────────────────────────────────────────────── */
-    .logs-list {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      margin-top: 16px;
-    }
-    .log-item {
-      display: grid;
-      grid-template-columns: auto 1fr auto;
-      align-items: start;
-      gap: 12px;
-      padding: 12px 16px;
-      background: rgba(255,255,255,0.03);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      animation: fadeIn 0.2s ease;
-    }
-    .log-item .log-msg { font-size: 0.88rem; color: var(--text); word-break: break-word; }
-    .log-item .log-ts  { font-size: 0.75rem; color: var(--text-muted); white-space: nowrap; }
-    .logs-empty        { color: var(--text-muted); text-align: center; padding: 32px 0; font-size: 0.9rem; }
-
-    /* ── Section panels ─────────────────────────────────────────────────── */
-    .section-panel { display: none; }
-    .section-panel.active { display: block; animation: fadeIn 0.3s ease; }
-
-    /* ── Divider ─────────────────────────────────────────────────────────── */
-    .divider { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
-
-    /* ── Grid helpers ────────────────────────────────────────────────────── */
-    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-
-    /* ── Theme variants ─────────────────────────────────────────────────── */
-    body.theme-light {
-      --bg:           #f8fafc;
-      --surface:      rgba(0,0,0,0.05);
-      --surface-hover:rgba(0,0,0,0.09);
-      --border:       rgba(0,0,0,0.12);
-      --text:         #0f172a;
-      --text-muted:   #64748b;
-      background-image: none;
-    }
-    body.theme-light .sidebar { background: rgba(241,245,249,0.95); }
-    body.theme-light select,
-    body.theme-light input[type="text"],
-    body.theme-light input[type="email"] { background: rgba(0,0,0,0.05); color: var(--text); }
-    body.theme-light select option { background: #f8fafc; color: #0f172a; }
-
-    body.theme-paper {
-      --bg:           #f5efe0;
-      --surface:      rgba(150,110,60,0.10);
-      --surface-hover:rgba(150,110,60,0.18);
-      --border:       rgba(100,75,40,0.18);
-      --text:         #2c1a06;
-      --text-muted:   #7a5f3a;
-      background-image: none;
-    }
-    body.theme-paper .sidebar { background: rgba(235,220,195,0.95); }
-    body.theme-paper select,
-    body.theme-paper input[type="text"],
-    body.theme-paper input[type="email"] { background: rgba(0,0,0,0.05); color: var(--text); }
-    body.theme-paper select option { background: #f5efe0; color: #2c1a06; }
-
-    /* dark theme is default; re-declare for explicit selection */
-    body.theme-dark {
-      --bg:           #0f0f1a;
-      --surface:      rgba(255,255,255,0.06);
-      --surface-hover:rgba(255,255,255,0.10);
-      --border:       rgba(255,255,255,0.10);
-      --text:         #e2e8f0;
-      --text-muted:   #94a3b8;
-    }
-
-    /* ── Toggle switch ───────────────────────────────────────────────────── */
-    .toggle-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 14px 0;
-      border-bottom: 1px solid var(--border);
-      margin-bottom: 22px;
-    }
-    .toggle-label-text { font-weight: 600; font-size: 0.95rem; }
-    .toggle-label-sub  { font-size: 0.78rem; color: var(--text-muted); margin-top: 3px; }
-
-    .toggle-switch {
-      position: relative;
-      display: inline-block;
-      width: 52px;
-      height: 28px;
-      flex-shrink: 0;
-    }
-    .toggle-switch input { opacity: 0; width: 0; height: 0; position: absolute; }
-    .toggle-track {
-      position: absolute;
-      inset: 0;
-      background: rgba(255,255,255,0.18);
-      border-radius: 28px;
-      cursor: pointer;
-      transition: background 0.3s ease;
-      border: 1px solid var(--border);
-    }
-    .toggle-track::before {
-      content: '';
-      position: absolute;
-      width: 22px; height: 22px;
-      left: 2px; top: 2px;
-      background: #fff;
-      border-radius: 50%;
-      transition: transform 0.3s cubic-bezier(.4,0,.2,1);
-      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-    }
-    .toggle-switch input:checked + .toggle-track { background: var(--brand); border-color: var(--brand-dark); }
-    .toggle-switch input:checked + .toggle-track::before { transform: translateX(24px); }
-    .toggle-switch input:focus-visible + .toggle-track { outline: 2px solid var(--brand-light); outline-offset: 3px; }
-
-    /* ── Range slider ────────────────────────────────────────────────────── */
-    .range-wrap { margin-top: 8px; }
-    input[type="range"] {
-      width: 100%;
-      accent-color: var(--brand);
-      cursor: pointer;
-      height: 6px;
-    }
-    .range-ticks {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.72rem;
-      color: var(--text-muted);
-      margin-top: 5px;
-      padding: 0 2px;
-    }
-
-    /* ── Skeleton shimmer ────────────────────────────────────────────────── */
-    @keyframes shimmer {
-      0%   { background-position: -600px 0; }
-      100% { background-position:  600px 0; }
-    }
-    .skeleton {
-      background: linear-gradient(
-        90deg,
-        var(--surface)       25%,
-        var(--surface-hover) 50%,
-        var(--surface)       75%
-      ) !important;
-      background-size: 1200px 100% !important;
-      animation: shimmer 1.5s infinite linear !important;
-      border-radius: var(--radius-sm) !important;
-      color: transparent !important;
-      border-color: transparent !important;
-      pointer-events: none;
-      user-select: none;
-      min-height: 16px;
-    }
-    .skeleton * { visibility: hidden; }
-
-    /* Skeleton placeholder blocks inside logs list */
-    .skeleton-block {
-      height: 52px;
-      border-radius: var(--radius-sm);
-      background: linear-gradient(
-        90deg,
-        var(--surface)       25%,
-        var(--surface-hover) 50%,
-        var(--surface)       75%
-      );
-      background-size: 1200px 100%;
-      animation: shimmer 1.5s infinite linear;
-      margin-bottom: 8px;
-    }
-
-    /* ── Mobile header ───────────────────────────────────────────────────── */
-    .mobile-header {
-      display: none;
-      align-items: center;
-      justify-content: space-between;
-      padding: 14px 16px;
-      background: rgba(15,15,26,0.90);
-      border-bottom: 1px solid var(--border);
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-    .mobile-header-brand { font-size: 0.95rem; font-weight: 700; color: var(--text); }
-
-    /* ── Responsive ──────────────────────────────────────────────────────── */
-    @media (max-width: 768px) {
-      .sidebar { display: none; }
-      .main-content { padding: 20px 16px; }
-      .section-tabs { display: flex; }
-      .grid-2 { grid-template-columns: 1fr; }
-      .mobile-header { display: flex; }
-    }
+    @keyframes pop{from{transform: translateY(6px); opacity:.7}to{transform: translateY(0); opacity:1}}
+    .toast .t{font-weight:700; font-size:13px}
+    .toast .d{color:var(--muted); font-size:12px; margin-top:4px; line-height:1.35}
+    .toast.ok{border-color: rgba(34,197,94,.45)}
+    .toast.err{border-color: rgba(239,68,68,.55)}
   </style>
 </head>
 <body>
-
-  <!-- =====================================================================
-       TOAST AREA — fixed overlay for pop-up notifications
-       ===================================================================== -->
-  <div id="toast-area" role="status" aria-live="polite"></div>
-
-  <!-- =====================================================================
-       LOADING SCREEN — shown while checking /auth/status on page load
-       ===================================================================== -->
-  <div id="loading-screen">
-    <div class="spinner spinner-lg"></div>
-    <p>Checking authentication…</p>
-  </div>
-
-  <!-- =====================================================================
-       LOGIN SCREEN — shown when user is not authenticated
-       ===================================================================== -->
-  <div id="login-screen" class="hidden">
-    <div class="card login-card">
-      <!-- App logo mark -->
-      <div class="login-logo" aria-hidden="true">
-        <!-- YouTube play icon -->
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
-             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polygon points="5 3 19 12 5 21 5 3"></polygon>
-        </svg>
-      </div>
-
-      <h1>AutoShorts <span>AI</span></h1>
-      <p>AI-powered YouTube Shorts automation.<br>Log in to manage your channel on autopilot.</p>
-
-      <!-- Login with Google button — redirects to backend OAuth endpoint -->
-      <button
-        id="btn-google-login"
-        type="button"
-        class="btn google-btn btn-full"
-        aria-label="Login with Google"
-      >
-        <!-- Google "G" logo SVG -->
-        <svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true">
-          <path fill="#EA4335" d="M24 9.5c3.13 0 5.93 1.08 8.14 2.84L38.3 6.18C34.44 2.36 29.5 0 24 0 14.62 0 6.6 5.48 2.88 13.44l7.1 5.52C11.7 13 17.4 9.5 24 9.5z"/>
-          <path fill="#4285F4" d="M46.52 24.5c0-1.62-.15-3.2-.42-4.72H24v8.94h12.69c-.55 2.93-2.2 5.42-4.67 7.1l7.17 5.56C43.24 37.36 46.52 31.44 46.52 24.5z"/>
-          <path fill="#FBBC05" d="M9.98 28.96A14.56 14.56 0 0 1 9.5 24c0-1.73.3-3.4.48-5.04l-7.1-5.52A24.04 24.04 0 0 0 0 24c0 3.86.9 7.5 2.88 10.56l7.1-5.6z"/>
-          <path fill="#34A853" d="M24 48c6.47 0 11.92-2.14 15.9-5.82l-7.17-5.56C30.7 38.5 27.5 39.5 24 39.5c-6.6 0-12.3-3.5-14.02-9.04l-7.1 5.6C6.6 44.52 14.62 48 24 48z"/>
-        </svg>
-        Continue with Google
-      </button>
-
-      <!-- Auth error message (shown if /auth/status returns error after redirect) -->
-      <div id="login-error" class="status-msg error hidden" role="alert"></div>
-    </div>
-  </div>
-
-  <!-- =====================================================================
-       DASHBOARD — shown when user is authenticated
-       ===================================================================== -->
-  <div id="dashboard" class="hidden">
-
-    <!-- ── Sidebar navigation ─────────────────────────────────────────── -->
-    <aside class="sidebar" aria-label="Main navigation">
-      <!-- Brand -->
-      <a class="sidebar-brand" href="#" aria-label="AutoShorts AI home">
-        <div class="sidebar-brand-icon" aria-hidden="true">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
-               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polygon points="5 3 19 12 5 21 5 3"></polygon>
-          </svg>
-        </div>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo"></div>
         <div>
-          <div class="sidebar-brand-text">AutoShorts AI</div>
-          <div class="sidebar-brand-sub">YouTube Automation</div>
+          <h1>AI YouTube Shorts SaaS</h1>
+          <div class="sub">Session-based Google OAuth · Settings persist · Worker automation</div>
         </div>
-      </a>
-
-      <!-- Nav links — each data-section maps to a .section-panel -->
-      <div class="nav-section-label">Menu</div>
-      <nav aria-label="Dashboard sections">
-        <button class="nav-item active" type="button" data-section="overview" aria-current="page">
-          <!-- Dashboard icon -->
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
-          Overview
-        </button>
-        <button class="nav-item" type="button" data-section="settings">
-          <!-- Settings icon -->
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M19.07 4.93a10 10 0 0 0-14.14 0"></path><path d="M4.93 19.07a10 10 0 0 0 14.14 0"></path><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line></svg>
-          Settings
-        </button>
-        <button class="nav-item" type="button" data-section="generate">
-          <!-- Sparkle / lightning icon -->
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-          Generate
-        </button>
-        <button class="nav-item" type="button" data-section="logs">
-          <!-- Logs / scroll icon -->
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-          Logs
-        </button>
-      </nav>
-
-      <div class="sidebar-spacer"></div>
-
-      <!-- Logout button in sidebar footer -->
-      <div class="sidebar-footer">
-        <button id="btn-logout" type="button" class="btn btn-ghost btn-sm btn-full">
-          <!-- Logout icon -->
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:16px;height:16px"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
-          Logout
-        </button>
       </div>
-    </aside>
 
-    <!-- ── Mobile header + Main content (right column) ──────────────── -->
-    <div class="content-col">
-
-    <!-- ── Mobile header (shown only on small screens) ───────────────── -->
-    <div class="mobile-header" aria-label="Mobile navigation">
-      <div class="mobile-header-brand">AutoShorts AI</div>
-      <button id="btn-logout-mobile" type="button" class="btn btn-ghost btn-sm" aria-label="Logout">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
-             style="width:14px;height:14px">
-          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-          <polyline points="16 17 21 12 16 7"></polyline>
-          <line x1="21" y1="12" x2="9" y2="12"></line>
-        </svg>
-        Logout
-      </button>
+      <div class="actions">
+        <button class="btn" id="btnRefresh">Refresh</button>
+        <button class="btn danger" id="btnLogout" style="display:none;">Logout</button>
+      </div>
     </div>
 
-    <!-- ── Main content area ──────────────────────────────────────────── -->
-    <main class="main-content" id="main-content">
+    <div id="authGate" class="card" style="display:none;">
+      <h2>Login Required</h2>
+      <p class="muted">You are not authenticated. Login with Google to access your dashboard.</p>
+      <div class="actions">
+        <a class="btn primary" id="btnLogin" href="/auth/google">Login with Google</a>
+      </div>
+    </div>
 
-      <!-- Mobile section tabs (replaces sidebar on small screens) -->
-      <div class="section-tabs" role="tablist" aria-label="Sections">
-        <button class="tab-btn active" type="button" data-section="overview" role="tab" aria-selected="true">Overview</button>
-        <button class="tab-btn" type="button" data-section="settings" role="tab" aria-selected="false">Settings</button>
-        <button class="tab-btn" type="button" data-section="generate" role="tab" aria-selected="false">Generate</button>
-        <button class="tab-btn" type="button" data-section="logs" role="tab" aria-selected="false">Logs</button>
+    <div id="app" class="grid" style="display:none;">
+      <!-- Settings -->
+      <div class="card">
+        <h2>Settings</h2>
+
+        <div class="row">
+          <div>
+            <label for="contentType">Content Type</label>
+            <select id="contentType">
+              <option value="islamic">Islamic</option>
+              <option value="motivation">Motivation</option>
+              <option value="success">Success</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="bgType">Background</label>
+            <select id="bgType">
+              <option value="paper">Paper</option>
+              <option value="dark">Dark</option>
+              <option value="light">Light</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label for="postsPerDay">Posts per day (1–8)</label>
+            <input id="postsPerDay" type="number" min="1" max="8" step="1" value="1" />
+            <div class="muted" style="margin-top:6px;">
+              Automation interval is calculated as 24 / postsPerDay hours.
+            </div>
+          </div>
+
+          <div>
+            <label>Automation</label>
+            <div class="toggleRow">
+              <div>
+                <strong id="autoLabel">Disabled</strong>
+                <div class="muted">Enable to let the worker upload automatically.</div>
+              </div>
+
+              <label class="switch" title="Enable automation">
+                <input id="autoMode" type="checkbox" />
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="btn primary" id="btnSave">Save Settings</button>
+          <button class="btn success" id="btnGenerate">Generate Now</button>
+        </div>
+
+        <div class="muted" style="margin-top:12px;">
+          Tip: If YouTube upload fails, reconnect your YouTube account in your OAuth flow.
+        </div>
       </div>
 
-      <!-- ── OVERVIEW SECTION ──────────────────────────────────────────── -->
-      <section id="panel-overview" class="section-panel active" aria-labelledby="heading-overview">
-        <div class="page-header">
-          <h2 id="heading-overview">Dashboard</h2>
-          <p>Welcome back! Here's an overview of your automation.</p>
-        </div>
+      <!-- Logs -->
+      <div class="card">
+        <h2>Latest Logs</h2>
+        <div class="muted">Last 5 events from generation/worker.</div>
+        <div class="logList" id="logList"></div>
+      </div>
+    </div>
+  </div>
 
-        <!-- User info card -->
-        <div class="card user-info-card">
-          <!-- Avatar: initials of username -->
-          <div class="user-avatar" id="user-avatar" aria-hidden="true">?</div>
-          <div class="user-details">
-            <h3 id="user-name">Loading…</h3>
-            <p id="user-email">—</p>
-          </div>
-        </div>
+  <div class="overlay" id="overlay">
+    <div class="spinner"></div>
+  </div>
 
-        <!-- Quick-action cards -->
-        <div class="grid-2" style="margin-bottom:0">
-          <div class="card" style="cursor:pointer" role="button" tabindex="0" data-section="generate"
-               aria-label="Go to Generate section">
-            <div class="section-title">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-              Generate
-            </div>
-            <p style="color:var(--text-muted);font-size:0.88rem">Create a new YouTube Short right now.</p>
-          </div>
-          <div class="card" style="cursor:pointer" role="button" tabindex="0" data-section="logs"
-               aria-label="Go to Logs section">
-            <div class="section-title">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
-              Logs
-            </div>
-            <p style="color:var(--text-muted);font-size:0.88rem">View the latest automation run logs.</p>
-          </div>
-        </div>
-      </section>
+  <div class="toastWrap" id="toastWrap"></div>
 
-      <!-- ── SETTINGS SECTION ──────────────────────────────────────────── -->
-      <section id="panel-settings" class="section-panel" aria-labelledby="heading-settings">
-        <div class="page-header">
-          <h2 id="heading-settings">Settings</h2>
-          <p>Configure your automation preferences.</p>
-        </div>
-
-        <div class="card">
-          <form id="settings-form" novalidate>
-
-            <!-- Automation ON/OFF toggle -->
-            <div class="toggle-row">
-              <div>
-                <div class="toggle-label-text">Automation ON/OFF</div>
-                <div class="toggle-label-sub">Enable automated posting to YouTube Shorts</div>
-              </div>
-              <label class="toggle-switch" aria-label="Toggle automation mode">
-                <input type="checkbox" id="chk-auto-mode" />
-                <span class="toggle-track"></span>
-              </label>
-            </div>
-
-            <!-- Content Type -->
-            <div class="form-group">
-              <label for="sel-content-type">Content Type</label>
-              <select id="sel-content-type" name="contentType">
-                <option value="islamic">Islamic</option>
-                <option value="motivation">Motivation</option>
-                <option value="success">Success</option>
-              </select>
-            </div>
-
-            <!-- Background Theme -->
-            <div class="form-group">
-              <label for="sel-bg-theme">Background Theme</label>
-              <select id="sel-bg-theme" name="bgType">
-                <option value="dark">Dark</option>
-                <option value="light">Light</option>
-                <option value="paper">Paper</option>
-              </select>
-            </div>
-
-            <!-- Daily Posts -->
-            <div class="form-group">
-              <label for="inp-daily-posts">
-                Posts per Day:
-                <strong id="posts-val" style="color:var(--brand-light)">3</strong>
-              </label>
-              <div class="range-wrap">
-                <input type="range" id="inp-daily-posts" name="postsPerDay" min="1" max="8" value="3" />
-                <div class="range-ticks" aria-hidden="true">
-                  <span>1</span><span>2</span><span>3</span><span>4</span>
-                  <span>5</span><span>6</span><span>7</span><span>8</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Save button + inline status -->
-            <button id="btn-save-settings" type="submit" class="btn btn-primary">
-              Save Settings
-            </button>
-            <div id="settings-status" class="status-msg hidden" role="status" aria-live="polite"></div>
-          </form>
-        </div>
-      </section>
-
-      <!-- ── GENERATE SECTION ──────────────────────────────────────────── -->
-      <section id="panel-generate" class="section-panel" aria-labelledby="heading-generate">
-        <div class="page-header">
-          <h2 id="heading-generate">Generate</h2>
-          <p>Trigger an on-demand YouTube Short generation.</p>
-        </div>
-
-        <div class="card">
-          <p style="color:var(--text-muted);margin-bottom:24px;font-size:0.92rem">
-            Clicking <strong>Generate Now</strong> will create a new AI-powered Short using your
-            current settings and queue it for upload.
-          </p>
-
-          <!-- Generate button + inline status -->
-          <button id="btn-generate" type="button" class="btn btn-accent">
-            <!-- Lightning bolt icon -->
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
-                 style="width:18px;height:18px">
-              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
-            </svg>
-            Generate Now
-          </button>
-          <div id="generate-status" class="status-msg hidden" role="status" aria-live="polite"></div>
-        </div>
-      </section>
-
-      <!-- ── LOGS SECTION ──────────────────────────────────────────────── -->
-      <section id="panel-logs" class="section-panel" aria-labelledby="heading-logs">
-        <div class="page-header">
-          <h2 id="heading-logs">Logs</h2>
-          <p>Recent automation activity (last 10 entries).</p>
-        </div>
-
-        <div class="card">
-          <!-- Header row: title + refresh button -->
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
-            <div class="section-title" style="margin:0">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                   stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                <polyline points="14 2 14 8 20 8"></polyline>
-                <line x1="16" y1="13" x2="8" y2="13"></line>
-                <line x1="16" y1="17" x2="8" y2="17"></line>
-              </svg>
-              Activity
-            </div>
-            <button id="btn-refresh-logs" type="button" class="btn btn-ghost btn-sm" aria-label="Refresh logs">
-              <!-- Refresh icon -->
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                   stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
-                   style="width:15px;height:15px">
-                <polyline points="1 4 1 10 7 10"></polyline>
-                <path d="M3.51 15a9 9 0 1 0 .49-3.33"></path>
-              </svg>
-              Refresh
-            </button>
-          </div>
-
-          <!-- Logs list container — populated by JS -->
-          <div id="logs-list" class="logs-list" role="list" aria-label="Log entries">
-            <div class="logs-empty">Loading logs…</div>
-          </div>
-        </div>
-      </section>
-
-    </main><!-- /.main-content -->
-    </div><!-- /.content-col -->
-  </div><!-- /#dashboard -->
-
-  <!-- =====================================================================
-       EMBEDDED JAVASCRIPT
-       All app logic is self-contained here — no external scripts needed.
-
-       Sections:
-         1. CONFIG        — API base URL, timeout
-         2. UTILS         — fetch wrapper, toast, helpers
-         3. AUTH          — checkAuth, showLogin, showDashboard, logout
-         4. NAV           — sidebar/tab navigation
-         5. USER INFO     — populate email / username
-         6. SETTINGS      — load + save via PATCH /profile
-         7. GENERATE      — POST /generate
-         8. LOGS          — GET /logs, renderLogs
-         9. INIT          — bootstrap on DOMContentLoaded
-       ===================================================================== -->
   <script>
-    'use strict';
+    // -----------------------------
+    // Small utilities
+    // -----------------------------
+    const $ = (id) => document.getElementById(id);
 
-    /* ====================================================================
-       1. CONFIG
-       ==================================================================== */
-    const API_BASE = 'https://automation-yt-saas.onrender.com';
+    function setLoading(on) {
+      $('overlay').classList.toggle('show', !!on);
+      $('btnSave').disabled = !!on;
+      $('btnGenerate').disabled = !!on;
+      $('btnRefresh').disabled = !!on;
+      $('autoMode').disabled = !!on;
+      $('contentType').disabled = !!on;
+      $('bgType').disabled = !!on;
+      $('postsPerDay').disabled = !!on;
+    }
 
-    /* Default fetch timeout (ms) */
-    const DEFAULT_TIMEOUT = 30000;
+    function toast(type, title, detail) {
+      const el = document.createElement('div');
+      el.className = 'toast ' + (type === 'ok' ? 'ok' : 'err');
+      el.innerHTML = '<div class="t"></div><div class="d"></div>';
+      el.querySelector('.t').textContent = title || (type === 'ok' ? 'Success' : 'Error');
+      el.querySelector('.d').textContent = detail || '';
+      $('toastWrap').appendChild(el);
+      setTimeout(() => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(6px)';
+        el.style.transition = 'all .2s ease';
+        setTimeout(() => el.remove(), 220);
+      }, 2600);
+    }
 
-    /* ====================================================================
-       2. UTILS
-       ==================================================================== */
-
-    /**
-     * apiFetch — thin wrapper around fetch that:
-     *   - Always sends credentials (cookies)
-     *   - Enforces a timeout via AbortController
-     *   - Throws a structured Error with .status on non-2xx responses
-     *
-     * @param {string} path       — API path, e.g. '/auth/status'
-     * @param {RequestInit} opts  — fetch options (method, body, headers …)
-     * @param {number} timeout    — ms before aborting (default: DEFAULT_TIMEOUT)
-     * @returns {Promise<any>}    — parsed JSON or null for 204
-     */
-    async function apiFetch(path, opts = {}, timeout = DEFAULT_TIMEOUT) {
-      const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), timeout);
-
+    function fmtTime(ts) {
       try {
-        const res = await fetch(API_BASE + path, {
-          ...opts,
-          credentials: 'include',           // always send session cookies
-          signal: controller.signal,
-          headers: {
-            'Content-Type': 'application/json',
-            ...(opts.headers || {}),
-          },
-        });
+        const d = new Date(ts);
+        return d.toLocaleString();
+      } catch {
+        return String(ts || '');
+      }
+    }
 
-        clearTimeout(timer);
-
-        /* Parse response body (gracefully — body may be empty on 204) */
-        let data = null;
-        const ct = res.headers.get('content-type') || '';
-        if (ct.includes('application/json')) {
-          try { data = await res.json(); } catch (_) { data = null; }
-        }
-
-        if (!res.ok) {
-          const msg = data?.message || data?.error || `HTTP ${res.status}`;
-          const err = new Error(msg);
-          err.status = res.status;
-          err.data   = data;
-          throw err;
-        }
-
-        return data;
-      } catch (err) {
-        clearTimeout(timer);
-        if (err.name === 'AbortError') {
-          const e = new Error('Request timed out. Please try again.');
-          e.status = 0;
-          throw e;
-        }
+    async function api(path, opts = {}) {
+      const res = await fetch(path, {
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json', ...(opts.headers || {}) },
+        ...opts,
+      });
+      const ct = (res.headers.get('content-type') || '').toLowerCase();
+      const data = ct.includes('application/json') ? await res.json().catch(() => ({})) : await res.text();
+      if (!res.ok) {
+        const msg = (data && data.error) ? data.error : (typeof data === 'string' ? data : 'Request failed');
+        const err = new Error(msg);
+        err.status = res.status;
+        err.data = data;
         throw err;
       }
+      return data;
     }
 
-    /* ── Toast helpers ──────────────────────────────────────────────────── */
-
-    /**
-     * showToast — display a transient notification at the top-right.
-     * @param {string} message
-     * @param {'success'|'error'|'info'} type
-     * @param {number} duration  ms until auto-dismiss (default 4000)
-     */
-    function showToast(message, type = 'info', duration = 4000) {
-      const area = document.getElementById('toast-area');
-      const el   = document.createElement('div');
-      el.className   = `toast toast-${type}`;
-      el.textContent = message;
-      el.setAttribute('role', 'alert');
-      area.appendChild(el);
-      setTimeout(() => {
-        el.style.opacity    = '0';
-        el.style.transition = 'opacity 0.3s ease';
-        setTimeout(() => el.remove(), 320);
-      }, duration);
+    // -----------------------------
+    // UI state setters
+    // -----------------------------
+    function setAutoUI(enabled) {
+      $('autoMode').checked = !!enabled;
+      $('autoLabel').textContent = enabled ? 'Enabled' : 'Disabled';
+      $('autoLabel').style.color = enabled ? '#86efac' : '#fca5a5';
     }
 
-    /**
-     * showStatus — display an inline status message beneath a form/button.
-     * @param {string}  elementId   — id of the .status-msg div
-     * @param {string}  message
-     * @param {'success'|'error'|'info'} type
-     * @param {number}  duration    ms, 0 = persistent (default 5000)
-     */
-    function showStatus(elementId, message, type = 'info', duration = 5000) {
-      const el = document.getElementById(elementId);
-      if (!el) return;
-      el.textContent  = message;
-      el.className    = `status-msg ${type}`;
-      el.style.display = 'block';
-      if (duration > 0) {
-        setTimeout(() => { el.style.display = 'none'; }, duration);
-      }
+    function clampPostsPerDay(v) {
+      const n = Number(v);
+      if (!Number.isFinite(n)) return 1;
+      return Math.min(8, Math.max(1, Math.round(n)));
     }
 
-    /** Hide a status message element */
-    function hideStatus(elementId) {
-      const el = document.getElementById(elementId);
-      if (el) el.style.display = 'none';
+    // -----------------------------
+    // Data loaders
+    // -----------------------------
+    async function checkAuth() {
+      // Expect /auth/status returns something like: { authenticated: true/false, user?: {...} }
+      const s = await api('/auth/status', { method: 'GET' });
+      return !!(s && (s.authenticated || s.loggedIn || s.ok));
     }
 
-    /* ── Button loading helpers ─────────────────────────────────────────── */
+    async function loadProfileIntoUI() {
+      const p = await api('/profile', { method: 'GET' });
 
-    /**
-     * setButtonLoading — swap button text with a spinner + label during API calls.
-     * Returns a restore function to call when done.
-     */
-    function setButtonLoading(btn, label = 'Loading…') {
-      const original = btn.innerHTML;
-      btn.disabled   = true;
-      btn.innerHTML  = `<span class="spinner" aria-hidden="true"></span>${label}`;
-      return () => {
-        btn.disabled  = false;
-        btn.innerHTML = original;
-      };
+      // You may return { user: {...} } or direct object; support both.
+      const u = p.user || p;
+
+      if (u.contentType) $('contentType').value = u.contentType;
+      if (u.bgType) $('bgType').value = u.bgType;
+      if (u.postsPerDay != null) $('postsPerDay').value = clampPostsPerDay(u.postsPerDay);
+
+      setAutoUI(!!u.autoMode);
     }
 
-    /* ====================================================================
-       3. AUTH
-       ==================================================================== */
-
-    /** Current authenticated user object (set after successful auth check) */
-    let currentUser = null;
-
-    /**
-     * applyTheme — add the matching theme class to <body> and remove others.
-     * Called on background-theme dropdown change and after profile load.
-     * @param {string} theme — 'dark' | 'light' | 'paper'
-     */
-    function applyTheme(theme) {
-      document.body.classList.remove('theme-dark', 'theme-light', 'theme-paper');
-      if (theme) document.body.classList.add('theme-' + theme);
-    }
-
-    /**
-     * checkAuthAndRender — called on page load.
-     * Hits GET /auth/status; shows dashboard or login accordingly.
-     */
-    async function checkAuthAndRender() {
-      try {
-        const data = await apiFetch('/auth/status');
-
-        /* The API may return { authenticated: true, user: { email, name } }
-           or simply { authenticated: true, email } depending on backend version.
-           We handle both shapes defensively. */
-        if (data && data.authenticated === true) {
-          /* Normalise user object */
-          currentUser = data.user || {
-            email: data.email || '',
-            name:  data.name  || (data.email ? data.email.split('@')[0] : 'User'),
-          };
-          showDashboard();
-        } else {
-          showLogin();
-        }
-      } catch (err) {
-        /* 401 means simply "not logged in" — normal, show login */
-        if (err.status === 401) {
-          showLogin();
-        } else {
-          /* Any other error — still show login with a helpful note */
-          showLogin('Unable to reach the server. Please try again later.');
-        }
-      }
-    }
-
-    /**
-     * showLoading — display the initial loading spinner while we check auth.
-     * (The loading screen is already visible in the HTML by default.)
-     */
-    function showLoading() {
-      document.getElementById('loading-screen').classList.remove('hidden');
-      document.getElementById('login-screen').classList.add('hidden');
-      document.getElementById('dashboard').classList.add('hidden');
-    }
-
-    /**
-     * showLogin — hide dashboard and loading; show login screen.
-     * @param {string} [errorMsg] — optional error to display on the login card
-     */
-    function showLogin(errorMsg) {
-      document.getElementById('loading-screen').classList.add('hidden');
-      document.getElementById('login-screen').classList.remove('hidden');
-      document.getElementById('dashboard').classList.add('hidden');
-
-      const errEl = document.getElementById('login-error');
-      if (errorMsg) {
-        errEl.textContent = errorMsg;
-        errEl.classList.remove('hidden');
-      } else {
-        errEl.classList.add('hidden');
-      }
-    }
-
-    /**
-     * showDashboard — hide login/loading; show the main dashboard.
-     * Also populates user info and loads initial data.
-     */
-    function showDashboard() {
-      document.getElementById('loading-screen').classList.add('hidden');
-      document.getElementById('login-screen').classList.add('hidden');
-      document.getElementById('dashboard').classList.remove('hidden');
-
-      /* Show skeleton placeholders on user info until data arrives */
-      ['user-avatar', 'user-name', 'user-email'].forEach(id => {
-        document.getElementById(id).classList.add('skeleton');
-      });
-
-      populateUserInfo();
-      loadLogs();   /* pre-fetch logs so the tab is ready */
-    }
-
-    /**
-     * logout — POST /auth/logout, then return to login screen.
-     */
-    async function logout() {
-      const btn    = document.getElementById('btn-logout');
-      const restore = setButtonLoading(btn, 'Logging out…');
-      try {
-        await apiFetch('/auth/logout', { method: 'POST' });
-      } catch (_) {
-        /* Ignore logout errors — always go back to login */
-      } finally {
-        restore();
-        currentUser = null;
-        showLogin();
-        showToast('You have been logged out.', 'info');
-      }
-    }
-
-    /* ====================================================================
-       4. NAVIGATION (sidebar + mobile tabs)
-       ==================================================================== */
-
-    /**
-     * activateSection — show the selected section panel and update
-     * active states on both sidebar buttons and mobile tab buttons.
-     * @param {string} sectionId  — e.g. 'settings', 'logs'
-     */
-    function activateSection(sectionId) {
-      /* Hide all panels */
-      document.querySelectorAll('.section-panel').forEach(p => p.classList.remove('active'));
-
-      /* Show the target panel */
-      const target = document.getElementById('panel-' + sectionId);
-      if (target) target.classList.add('active');
-
-      /* Update sidebar nav buttons */
-      document.querySelectorAll('.nav-item[data-section]').forEach(btn => {
-        const isActive = btn.dataset.section === sectionId;
-        btn.classList.toggle('active', isActive);
-        btn.setAttribute('aria-current', isActive ? 'page' : 'false');
-      });
-
-      /* Update mobile tab buttons */
-      document.querySelectorAll('.tab-btn[data-section]').forEach(btn => {
-        const isActive = btn.dataset.section === sectionId;
-        btn.classList.toggle('active', isActive);
-        btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
-      });
-
-      /* Lazy-load logs when the logs tab is activated */
-      if (sectionId === 'logs') loadLogs();
-    }
-
-    /* ====================================================================
-       5. USER INFO
-       ==================================================================== */
-
-    /**
-     * populateUserInfo — fill in email, username, and avatar initial
-     * from the currentUser object set during auth check.
-     */
-    function populateUserInfo() {
-      if (!currentUser) return;
-
-      /* Derive username from email prefix (the part before "@") */
-      const email    = currentUser.email || '';
-      const username = currentUser.name
-        || (email ? email.split('@')[0] : 'User');
-
-      document.getElementById('user-name').textContent  = username;
-      document.getElementById('user-email').textContent = email || 'No email available';
-
-      /* Avatar: first letter of username (uppercase) */
-      const initial = username.charAt(0).toUpperCase() || '?';
-      document.getElementById('user-avatar').textContent = initial;
-
-      /* Remove skeleton classes now that data is ready */
-      ['user-avatar', 'user-name', 'user-email'].forEach(id => {
-        document.getElementById(id).classList.remove('skeleton');
-      });
-    }
-
-    /* ====================================================================
-       6. SETTINGS — load current profile & save via PATCH /profile
-       ==================================================================== */
-
-    /**
-     * loadSettings — fetch GET /profile and pre-fill the settings form.
-     * Called lazily when the settings section is first shown.
-     */
-    async function loadSettings() {
-      try {
-        const profile = await apiFetch('/profile');
-        if (!profile) return;
-
-        /* Content type */
-        const ct = profile.contentType || profile.content_type;
-        const ctEl = document.getElementById('sel-content-type');
-        if (ctEl && ct != null) ctEl.value = ct;
-
-        /* Background theme — accept bgType or legacy field names */
-        const bg = profile.bgType || profile.backgroundTheme || profile.background_theme;
-        const bgEl = document.getElementById('sel-bg-theme');
-        if (bgEl && bg != null) {
-          bgEl.value = bg;
-          applyTheme(bg);
-        }
-
-        /* Posts per day — accept postsPerDay or legacy field names */
-        const posts = profile.postsPerDay ?? profile.dailyPosts ?? profile.posts_per_day;
-        if (posts != null) {
-          const slider = document.getElementById('inp-daily-posts');
-          const label  = document.getElementById('posts-val');
-          if (slider) slider.value = posts;
-          if (label)  label.textContent = posts;
-        }
-
-        /* Auto mode toggle */
-        const autoMode = profile.autoMode ?? profile.auto_mode;
-        if (autoMode != null) {
-          const chk = document.getElementById('chk-auto-mode');
-          if (chk) chk.checked = Boolean(autoMode);
-        }
-      } catch (err) {
-        /* Not fatal — form already has sensible defaults */
-        if (err.status !== 404) {
-          showStatus('settings-status', 'Could not load current settings.', 'error', 6000);
-        }
-      }
-    }
-
-    /**
-     * saveSettings — read form values and PATCH /profile.
-     * Disables the button during the request; shows inline status.
-     */
-    async function saveSettings(e) {
-      e.preventDefault();
-      hideStatus('settings-status');
-
-      const btn     = document.getElementById('btn-save-settings');
-      const restore = setButtonLoading(btn, 'Saving…');
-
-      /* Collect form values — field names match the API spec exactly */
-      const payload = {
-        contentType: document.getElementById('sel-content-type').value,
-        bgType:      document.getElementById('sel-bg-theme').value,
-        postsPerDay: parseInt(document.getElementById('inp-daily-posts').value, 10),
-        autoMode:    document.getElementById('chk-auto-mode').checked,
-      };
-
-      try {
-        await apiFetch('/profile', {
-          method: 'PATCH',
-          body:   JSON.stringify(payload),
-        });
-        showStatus('settings-status', '✓ Settings saved successfully!', 'success');
-        showToast('Settings saved.', 'success');
-        loadLogs(); /* auto-refresh logs after save */
-      } catch (err) {
-        const msg = err.message || 'Failed to save settings. Please try again.';
-        showStatus('settings-status', msg, 'error', 8000);
-        showToast(msg, 'error');
-      } finally {
-        restore();
-      }
-    }
-
-    /* ====================================================================
-       7. GENERATE — POST /generate
-       ==================================================================== */
-
-    /**
-     * triggerGenerate — send POST /generate and surface the result.
-     */
-    async function triggerGenerate() {
-      hideStatus('generate-status');
-
-      const btn     = document.getElementById('btn-generate');
-      const restore = setButtonLoading(btn, 'Generating…');
-
-      showStatus('generate-status', 'Generation in progress — this may take a minute…', 'info', 0);
-
-      try {
-        const result = await apiFetch('/generate', { method: 'POST' }, 120000); /* 2-min timeout */
-        const msg = result?.message
-          || (result?.videoId ? `✓ Video created (ID: ${result.videoId})` : '✓ Generation complete!');
-        showStatus('generate-status', msg, 'success');
-        showToast('Video generated successfully!', 'success');
-        loadLogs(); /* auto-refresh logs after generation */
-      } catch (err) {
-        const msg = err.message || 'Generation failed. Please try again.';
-        showStatus('generate-status', msg, 'error', 0);
-        showToast(msg, 'error');
-      } finally {
-        restore();
-      }
-    }
-
-    /* ====================================================================
-       8. LOGS — GET /logs, render last 10
-       ==================================================================== */
-
-    /**
-     * loadLogs — fetch GET /logs and render the most-recent 10 entries.
-     * Updates the #logs-list container.
-     */
     async function loadLogs() {
-      const container = document.getElementById('logs-list');
-      if (!container) return;
+      const data = await api('/logs', { method: 'GET' });
+      const logs = (data.logs || data || []);
+      const last5 = Array.isArray(logs) ? logs.slice(0, 5) : [];
 
-      /* Show shimmer skeleton placeholders while loading */
-      container.innerHTML = [1,2,3].map(() =>
-        '<div class="skeleton-block" role="presentation"></div>'
-      ).join('');
+      const list = $('logList');
+      list.innerHTML = '';
 
-      try {
-        const data = await apiFetch('/logs');
-
-        /* API may return an array directly, or { logs: [...] } */
-        let entries = Array.isArray(data) ? data : (data?.logs || []);
-
-        /* Keep last 10 (most-recent first if already sorted; take tail otherwise) */
-        if (entries.length > 10) entries = entries.slice(-10);
-
-        /* Sort newest-first for display */
-        entries = [...entries].sort((a, b) => {
-          const ta = new Date(a.timestamp || a.createdAt || 0).getTime();
-          const tb = new Date(b.timestamp || b.createdAt || 0).getTime();
-          return tb - ta;
-        });
-
-        renderLogs(entries);
-      } catch (err) {
-        container.innerHTML = `<div class="logs-empty" style="color:var(--error)">
-          Failed to load logs: ${escapeHtml(err.message || 'Unknown error')}
-        </div>`;
-      }
-    }
-
-    /**
-     * renderLogs — build the log list DOM from an array of log objects.
-     * Each entry may have: status, message, timestamp / createdAt.
-     * @param {Array} entries
-     */
-    function renderLogs(entries) {
-      const container = document.getElementById('logs-list');
-      if (!container) return;
-
-      if (!entries || entries.length === 0) {
-        container.innerHTML = '<div class="logs-empty">No log entries yet.</div>';
+      if (last5.length === 0) {
+        const empty = document.createElement('div');
+        empty.className = 'logItem';
+        empty.innerHTML = '<div class="muted">No logs yet.</div>';
+        list.appendChild(empty);
         return;
       }
 
-      /* Determine badge type from log status string */
-      const badgeClass = (status) => {
-        const s = (status || '').toLowerCase();
-        if (s.includes('success') || s.includes('done') || s.includes('complete')) return 'badge-success';
-        if (s.includes('error')   || s.includes('fail'))                            return 'badge-error';
-        if (s.includes('warn'))                                                      return 'badge-warn';
-        return 'badge-info';
-      };
+      for (const item of last5) {
+        const el = document.createElement('div');
+        el.className = 'logItem';
+        const status = (item.status || 'unknown').toString();
+        const msg = (item.message || '').toString();
+        const time = item.timestamp || item.time || item.createdAt || '';
 
-      /** Format an ISO timestamp into a human-readable local string */
-      const fmtDate = (ts) => {
-        if (!ts) return '—';
-        const d = new Date(ts);
-        if (isNaN(d)) return ts;
-        return d.toLocaleString(undefined, {
-          month: 'short', day: 'numeric',
-          hour: '2-digit', minute: '2-digit',
-        });
-      };
-
-      container.innerHTML = entries.map(log => `
-        <div class="log-item" role="listitem">
-          <span class="badge ${badgeClass(log.status)}">${escapeHtml(log.status || 'info')}</span>
-          <span class="log-msg">${escapeHtml(log.message || log.msg || '—')}</span>
-          <span class="log-ts">${fmtDate(log.timestamp || log.createdAt)}</span>
-        </div>
-      `).join('');
+        el.innerHTML = `
+          <div class="logTop">
+            <span class="badge">${status}</span>
+            <span class="time">${fmtTime(time)}</span>
+          </div>
+          <div class="msg">${escapeHtml(msg)}</div>
+        `;
+        list.appendChild(el);
+      }
     }
 
-    /**
-     * escapeHtml — prevent XSS when inserting untrusted log/API text into innerHTML.
-     * @param {string} str
-     * @returns {string}
-     */
     function escapeHtml(str) {
-      return String(str)
-        .replace(/&/g,  '&amp;')
-        .replace(/</g,  '&lt;')
-        .replace(/>/g,  '&gt;')
-        .replace(/"/g,  '&quot;')
-        .replace(/'/g,  '&#39;');
+      return String(str || '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
     }
 
-    /* ====================================================================
-       9. INIT — wire up all event listeners and start the auth check
-       ==================================================================== */
-    document.addEventListener('DOMContentLoaded', () => {
+    // -----------------------------
+    // Save actions
+    // -----------------------------
+    async function saveAll() {
+      const contentType = $('contentType').value;
+      const bgType = $('bgType').value;
+      const postsPerDay = clampPostsPerDay($('postsPerDay').value);
+      const enabled = $('autoMode').checked;
 
-      /* ── Login button ─────────────────────────────────────────────────── */
-      document.getElementById('btn-google-login').addEventListener('click', () => {
-        /* Full-page redirect to backend OAuth endpoint (relative path) */
-        window.location.href = '/auth/google';
+      // 1) Save profile settings
+      await api('/profile', {
+        method: 'PATCH',
+        body: JSON.stringify({ contentType, bgType, postsPerDay }),
       });
 
-      /* ── Logout buttons (sidebar + mobile header) ─────────────────────── */
-      document.getElementById('btn-logout').addEventListener('click', logout);
-      document.getElementById('btn-logout-mobile').addEventListener('click', logout);
-
-      /* ── Sidebar nav buttons ─────────────────────────────────────────── */
-      document.querySelectorAll('.nav-item[data-section]').forEach(btn => {
-        btn.addEventListener('click', () => activateSection(btn.dataset.section));
+      // 2) Save automation toggle
+      await api('/auto', {
+        method: 'POST',
+        body: JSON.stringify({ enabled }),
       });
 
-      /* ── Mobile tab buttons ───────────────────────────────────────────── */
-      document.querySelectorAll('.tab-btn[data-section]').forEach(btn => {
-        btn.addEventListener('click', () => activateSection(btn.dataset.section));
-      });
+      toast('ok', 'Saved successfully', 'Your settings were updated.');
+    }
 
-      /* ── Quick-action card clicks (keyboard-accessible) ──────────────── */
-      document.querySelectorAll('[data-section][role="button"]').forEach(card => {
-        card.addEventListener('click',   () => activateSection(card.dataset.section));
-        /* Also allow Enter/Space for keyboard users */
-        card.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            activateSection(card.dataset.section);
-          }
-        });
-      });
+    async function generateNow() {
+      await api('/generate', { method: 'POST', body: JSON.stringify({}) });
+      toast('ok', 'Generation started', 'Check logs for progress.');
+      await loadLogs().catch(() => {});
+    }
 
-      /* ── Settings form submit ─────────────────────────────────────────── */
-      document.getElementById('settings-form').addEventListener('submit', saveSettings);
+    // -----------------------------
+    // App bootstrap
+    // -----------------------------
+    async function boot() {
+      setLoading(true);
+      try {
+        const authed = await checkAuth();
 
-      /* ── Background theme — apply to UI immediately on change ─────────── */
-      document.getElementById('sel-bg-theme').addEventListener('change', function () {
-        applyTheme(this.value);
-      });
+        if (!authed) {
+          $('authGate').style.display = 'block';
+          $('app').style.display = 'none';
+          $('btnLogout').style.display = 'none';
+          return;
+        }
 
-      /* ── Posts-per-day range slider — update live label ──────────────── */
-      document.getElementById('inp-daily-posts').addEventListener('input', function () {
-        document.getElementById('posts-val').textContent = this.value;
-      });
+        $('authGate').style.display = 'none';
+        $('app').style.display = 'grid';
+        $('btnLogout').style.display = 'inline-block';
 
-      /* ── Lazy-load settings when section becomes active ──────────────── */
-      /* We hook into each nav item click to detect settings navigation */
-      document.querySelectorAll('[data-section="settings"]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          /* Only load once per session unless already populated */
-          if (!btn._settingsLoaded) {
-            loadSettings();
-            btn._settingsLoaded = true;
-          }
-        });
-      });
+        // ✅ FIX: load saved settings so refresh does not reset
+        await loadProfileIntoUI();
+        await loadLogs();
+      } catch (e) {
+        toast('err', 'Failed to load', e.message || 'Unknown error');
+        $('authGate').style.display = 'block';
+        $('app').style.display = 'none';
+      } finally {
+        setLoading(false);
+      }
+    }
 
-      /* ── Generate button ─────────────────────────────────────────────── */
-      document.getElementById('btn-generate').addEventListener('click', triggerGenerate);
+    // -----------------------------
+    // Event bindings
+    // -----------------------------
+    $('btnRefresh').addEventListener('click', () => boot());
 
-      /* ── Refresh logs button ─────────────────────────────────────────── */
-      document.getElementById('btn-refresh-logs').addEventListener('click', () => {
-        const btn     = document.getElementById('btn-refresh-logs');
-        const restore = setButtonLoading(btn, 'Refreshing…');
-        loadLogs().finally(() => restore());
-      });
-
-      /* ── Start: check auth status ─────────────────────────────────────── */
-      /* The loading screen is already shown by default in the HTML.
-         checkAuthAndRender will transition to either the dashboard or login. */
-      checkAuthAndRender();
+    $('autoMode').addEventListener('change', () => {
+      setAutoUI($('autoMode').checked);
     });
+
+    $('btnSave').addEventListener('click', async () => {
+      setLoading(true);
+      try {
+        await saveAll();
+        await loadLogs().catch(() => {});
+      } catch (e) {
+        toast('err', 'Save failed', e.message || 'Unknown error');
+      } finally {
+        setLoading(false);
+      }
+    });
+
+    $('btnGenerate').addEventListener('click', async () => {
+      setLoading(true);
+      try {
+        await generateNow();
+      } catch (e) {
+        toast('err', 'Generate failed', e.message || 'Unknown error');
+      } finally {
+        setLoading(false);
+      }
+    });
+
+    $('btnLogout').addEventListener('click', async () => {
+      // If you have /auth/logout route, call it. Otherwise just tell user.
+      setLoading(true);
+      try {
+        // Best effort; if route doesn't exist, it will error and we show message.
+        await api('/auth/logout', { method: 'POST', body: JSON.stringify({}) });
+        toast('ok', 'Logged out', 'Session ended.');
+      } catch (e) {
+        toast('err', 'Logout', 'If logout endpoint is not implemented, clear cookies manually.');
+      } finally {
+        setLoading(false);
+        boot();
+      }
+    });
+
+    // Start
+    boot();
   </script>
 </body>
 </html>
